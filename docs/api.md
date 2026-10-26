@@ -1,5 +1,7 @@
 # Local HTTP API
 
+Edition notice: this document describes the loopback prototype. For the deployed Flask API, browser research routes and edition differences, use [api-reference.md](api-reference.md). The current engineering pack starts at [docs/README.md](README.md).
+
 Base URL: `http://127.0.0.1:8765`. This is the trusted local-owner interface, not a public API. Hermes uses the separate stdio MCP interface.
 
 POST requests require `Content-Type: application/json` and `X-Home-Agent: local-console`. Origin, if present, must match the local host; Host must match localhost/127.0.0.1 and the bound port. The server does not enable cross-origin requests. JSON bodies are capped at 8 MB.

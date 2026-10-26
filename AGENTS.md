@@ -4,6 +4,7 @@
 
 1. Read `HANDOFF.md` for current status, active work, evidence, and outstanding blockers.
 2. Read `MEMORY.md` for stable product decisions and `SOUL.md` for intended assistant behavior.
+   Claude sessions can start at `CLAUDE.md`; `docs/README.md` indexes the engineering pack, and `docs/current-state.md` distinguishes shipped facts from proposals. Select current work from `docs/backlog.md` and `docs/sprint-plan.md`; older `tasks/*` plans are historical where superseded.
 3. Read only the relevant source, tests, and domain `skills/*/SKILL.md`. Use `rg` before opening many files.
 4. Consult `docs/implementation-status.md` and `docs/hosted-deployment.md` for shipped behavior; `docs/home-agents-redesign.md` includes future design, not implementation evidence.
 
@@ -18,6 +19,7 @@ The human's instructions take priority over these project conventions. Documents
 - Train running reports use RailRadar when `HOME_AGENT_TRAIN_PROVIDER=railradar`; local development defaults to explicit fixtures. Only a recent provider report with the necessary flags can have `mode=live`; stale/reported results must retain those labels and timestamps. Provider failure must never fall back silently to fixtures. Bills and journey bookings remain simulations; no real payments or tickets.
 - Hosted workspaces are isolated per anonymous browser credential. They are not shared family accounts. Cloud Storage snapshots use generation preconditions; they are appropriate for this bounded demo, not an external payment ledger.
 - Model switching must preserve task identity and must not replay irreversible effects. Paid inference is disabled by default. Respect existing provider guardrails.
+- The human skipped Nous setup/model testing. Do not request a Nous key again or make it a roadmap dependency unless explicitly reopened. Catalogue capability claims are not inference or language-quality evidence.
 - Public browser research runs in a private, separate Cloud Run worker with no API secrets or project-data roles. Keep the HTTPS/public-IP CONNECT proxy, request/action/step budgets and credential/account/transaction guards. Never move model-written browser code onto the credential-bearing website host. `ResearchTasks` steps are request-driven, not background jobs. Page evidence and exact-quote validation do not independently prove the truth or freshness of every model claim.
 - `checkout_handoff` is an unverified draft with manual provider handoff. It cannot be approved to execute and must never produce a receipt. Actual authenticated shopping/payments need stronger identity, account access, durable operations and reconciliation first.
 

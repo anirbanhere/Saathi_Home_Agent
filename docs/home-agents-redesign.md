@@ -1,5 +1,7 @@
 # Home Agents: WhatsApp voice product and architecture
 
+Current documentation pack: [architecture](architecture.md), [roadmap](roadmap.md), [sprint plan](sprint-plan.md), [backlog](backlog.md). This earlier redesign preserves decision history; its VM/clinic-first ordering is superseded where the newer documents and ADR-002/003 say otherwise.
+
 Date: 26 October 2026, Asia/Kolkata. Status: revised design; implementation pending.
 
 This is the current design direction. It supersedes the workflow ordering and fixed-model assumptions in `hackathon-demo-spec.md`; `implementation-status.md` remains the evidence for what actually runs today.

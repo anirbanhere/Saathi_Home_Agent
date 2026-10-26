@@ -1,91 +1,85 @@
-# Home Agent
+# Home Agents
 
-Source repository: [anirbanhere/Saathi_Home_Agent](https://github.com/anirbanhere/Saathi_Home_Agent).
+A household assistant for everyday tasks, cooking and inventory, with Tamil, Malayalam, Kannada, Hindi and English as target languages. The current executable product is a public Python website; WhatsApp voice is the intended primary interface as development continues.
 
-Current product design: [WhatsApp voice and interchangeable models on GCP](docs/home-agents-redesign.md), with an [ordered delivery plan](tasks/voice-first-plan.md). These describe the next architecture; the runnable prototype below retains its current behavior.
+**[Open the demo](https://home-agents-xswei7prnq-uc.a.run.app/)** · **[Documentation](docs/README.md)** · **[Roadmap](docs/roadmap.md)** · **[Sprint plan](docs/sprint-plan.md)** · **[Backlog](docs/backlog.md)**
 
-Public website: **https://home-agents-xswei7prnq-uc.a.run.app**. Deployment project: [`sathi-home-agent` in `us-central1`](docs/gcp-setup.md). See the deployment record for actual tool checks and current free-provider availability.
+Source: [anirbanhere/Saathi_Home_Agent](https://github.com/anirbanhere/Saathi_Home_Agent). GCP project `sathi-home-agent`, region `us-central1`.
 
-A household-agent prototype with a hosted Python website and a separate offline local console. The hosted version supports live OpenRouter free-model reasoning, validated tool calls, private per-visitor persistence, kitchen workflows and explicit sandbox approvals. Actual inference depends on provider availability and account guardrails.
+## Continue with Claude or another coding agent
 
-## Hosted application and AI-assisted maintenance
+Start with [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md). The [copyable Claude prompt](docs/handoff/CLAUDE_START_HERE.md) selects a concrete next task. The [documentation index](docs/README.md) maps architecture, API/data design, model/Hermes integration, voice/WhatsApp, security, testing and cloud operations.
 
-See [hosted deployment](docs/hosted-deployment.md) for the website runtime, deployment record, persistence limits and rollback. Hosted dependencies are in `requirements-hosted.txt`; the local console below remains dependency-free. Neither version currently connects WhatsApp, external clinic booking, real payment/ticket providers, or hosted speech.
+[MEMORY.md](MEMORY.md) holds stable development choices; [SOUL.md](SOUL.md) describes intended product behavior. These files are engineering context, not automatic runtime personal memory or tool permissions. The human skipped Nous setup/model testing; it is not a required onboarding step.
 
-Coding agents start with [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md). [SOUL.md](SOUL.md) describes product behavior; [MEMORY.md](MEMORY.md) holds stable development decisions. Domain engineering guides live in `skills/*/SKILL.md`, and GitHub CI runs the tests without production credentials. These Markdown files support development context; they are not automatically loaded as runtime personal memory.
+## What actually works
 
-Train running status: choose **Activity → Check a train**, enter the five-digit train number and the date it departed its origin (India time). The direct lookup uses RailRadar without waiting for an AI model. Source/update times are visible; stale or estimated data is labeled. See [railway integration](docs/live-trains.md) for setup, free-tier limits and verification status.
+| Capability | Current state |
+| --- | --- |
+| Public website | Flask/Gunicorn on Cloud Run, separate anonymous visitor workspaces saved in private GCS |
+| Free-model planning | Bounded OpenRouter tool loop and key-permitted free-model selector; last real inference attempts returned 429 |
+| Public web research | Real isolated Chromium inspection, sources/timestamps, persisted progress/resume/cancel; AI reasoning remains provider-capacity dependent |
+| Train status | Direct RailRadar report lookup, independent of the LLM, with source/update/freshness labels |
+| Kitchen | Reviewed grocery CSV import, normalized units, corrections, event history and repeat-safe estimated meal consumption |
+| Cooking | Three curated recipes, serving/spice customization and inventory/history suggestions; no processed YouTube video |
+| Bills/food orders | Unverified manual provider-handoff drafts; sandbox bill/journey examples remain separate simulations |
+| Hermes/Meta/speech | Prepared adapters/contracts; no verified connected Hermes runtime, hosted Meta inference or hosted ASR/TTS |
 
-## Run
+WhatsApp, real household accounts/sharing, owned clinic bookings, receipt-image OCR and real payment/order execution are not shipped. All four Indian languages remain targets; existing template/text tests do not establish voice fluency. See [current state and evidence](docs/current-state.md) for precise verification scope.
 
-Requires Python 3.11 or newer. The application has **no third-party Python or JavaScript runtime dependencies**.
+## Try the public demo
 
-```powershell
-cd "C:\Users\anirban\Documents\ChatGPT\Home Agent"
-python -m home_agent
-```
+1. **Activity → Public web research:** inspect a public HTTPS page without a domain API key or LLM response. Unsupported/login/challenge pages pause for handoff. Research stops advancing after the current request when the client is closed/hidden; resume from history.
+2. **Activity → Check a train:** enter the five-digit train number and date it departed its origin in India time. Provider reports can be stale; inspect update time and mode.
+3. **Kitchen:** import reviewed grocery CSV with a unique reference, create a cooking plan and confirm the meal. Planning does not consume stock; confirmation deducts estimated usage once.
+4. **Bills & food orders:** save a handoff draft and verify/complete the actual checkout in the provider's secure app. The demo does not pay or place an order.
 
-Open http://127.0.0.1:8765. Stop with Ctrl+C. State is stored in `data/home-agent.sqlite3` and survives restarts.
+Only enter demonstration data while evaluating the anonymous public prototype. A new conversation is not a new account, and losing the browser credential has no implemented account-recovery flow.
 
-For a separate clean demo without deleting existing data:
+## Local development
 
-```powershell
-python -m home_agent --port 8766 --db data/rehearsal.sqlite3
-```
-
-## What works now
-
-- Responsive browser console with conversation, kitchen, task history, and explicit connection status.
-- A small offline phrase router and templates for the four requested languages. Dates and train/account identifiers are validated. Follow-ups retain missing fields and requests are deduplicated by message reference.
-- Train fixtures for 12627, 12623, and 12658; unknown trains fail honestly. **None are live train positions.**
-- Electricity bill and journey-booking simulators. An owner reviews a task, explicitly approves it, and receives a `SANDBOX-` reference. Concurrent/repeated approval executes once.
-- Grocery CSV ingestion, g/kg and ml/l normalization, bill deduplication, stock correction, and an append-only inventory event history.
-- Three curated recipes: tomato rice, simple dal, and vegetable upma. Serving counts and chilli reduction affect ingredient requirements. Cooking plans and suggestions do not deduct stock. Marking a meal cooked deducts estimated usage atomically and once; insufficient stock prevents partial deductions.
-- Optional direct Meta Muse adapter with validated tool calls. It requires your API key and has not been tested against a live Meta account.
-- A stdio MCP server exposes the same tools to Hermes with a fixed owner/cook role. No approval, payment execution, or inventory mutation tools are exposed to the model. The server has protocol and tool tests; an actual Hermes session has not yet been paired.
-- Optional JSON speech-service adapters and audio-file input. They require a separately running Indic ASR/TTS service. No speech weights are downloaded or bundled.
-
-## Try it
-
-1. Select Tamil, Malayalam, Kannada, or Hindi and use a conversation starter. You can also enter `train 12627 2026-11-01` or `pay electricity bill DEMO-1042`.
-2. Review the bill task. Approve the sandbox action, then inspect its source, reference, and history.
-3. In Kitchen, add the example grocery text. Submit the same reference twice; stock increases once.
-4. Create a cooking plan for two people with less chilli. Inspect ingredients, then mark cooked and check the inventory event history.
-5. In Activity, create and approve or cancel a sandbox journey.
-
-Offline mode is deliberately narrow. It does not understand arbitrary vernacular requests. Recipe instructions are currently English, with localized introductory/status templates. No fluent-speaker review or speech benchmark has been performed.
-
-## Verify
+CI/hosted baseline is Python 3.12. Use an isolated environment:
 
 ```powershell
-python -m unittest discover -s tests -v
-python -m evals.run
-python -m compileall -q home_agent
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-hosted.txt
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
 node --check web/app.js
 ```
 
-Node is needed only for the optional JavaScript syntax check. HTTP integration tests use temporary loopback servers and may need network-sandbox permission in an agent runner. Test databases are isolated under the ignored `data/test-temp/` directory.
+The separate standard-library offline console can be started with:
 
-## Connect the models
+```powershell
+.\.venv\Scripts\python.exe -m home_agent --port 8766 --db data/rehearsal.sqlite3
+```
 
-See [docs/integrations.md](docs/integrations.md) for direct Muse setup, Hermes MCP configuration, the WhatsApp path, and Indic speech endpoint contracts. `.env.example` is a reference; the program reads process environment variables and does not automatically load `.env` files.
+Open `http://127.0.0.1:8766`. This trusted loopback edition does not implement all hosted research/OpenRouter routes. Do not expose it through a public tunnel. Hosted routes require the Flask boundary and Secure-cookie-aware testing; see [development setup](docs/development-and-claude.md).
 
-## Demo boundaries
+The earlier Sites edition is a separate static/browser-local demo, not the Python Cloud Run deployment. Browser worker dependencies are in `requirements-browser.txt`; they are not needed to run normal mocked unit tests.
 
-This is a **single-owner, loopback-only demo**, not a public server or a multi-user authentication system. The browser console is trusted as the local owner; the configured MCP role is the server's authority. Do not expose port 8765 through a public tunnel. Browser requests are protected against cross-origin writes and unexpected Host headers, but local processes remain trusted.
+## Configuration and checks
 
-WhatsApp messaging, YouTube/video understanding, grocery-image OCR, real bookings/payments, and actual Indic inference are **not connected**. Railway reports use the separate RailRadar integration when configured; the local console still defaults to labeled fixtures. Synthetic evaluation results measure the offline phrase router only.
+`.env.example` documents environment names. The program reads process environment and does not automatically load `.env`. Production keys stay in Secret Manager; never commit them or copy them into the browser worker. See the [API reference](docs/api-reference.md), [integration guide](docs/integrations.md) and [operations runbook](docs/operations-runbook.md).
 
-No accounts were paired and no messages were sent to your cook or other contacts. No credentials are included in the repository.
+```text
+python -m unittest discover -s tests -v
+node --check web/app.js
+python -m compileall -q home_agent
+```
+
+The implementation checkpoint has 80 unit/API tests and separate dated live browser/railway evidence. `python -m evals.run` is an optional 40-case offline phrase evaluation that regenerates a documentation report; it is not a speech benchmark. GitHub Actions runs the existing suite without production credentials. See [evaluation strategy](docs/testing-and-evaluation.md).
 
 ## Project map
 
 ```text
-home_agent/     SQLite workflows, HTTP server, Muse/speech adapters, MCP server
-web/            Browser console (HTML, CSS, JavaScript)
-tests/          Workflow, provider-contract, HTTP and markup tests
-evals/          Four-language offline phrase-routing evaluation
-docs/           Architecture, integration instructions, demo script, limitations
-tasks/          Original plan and implementation status
-data/           Generated local databases/results, ignored by Git
+home_agent/      Domain tools, local/hosted APIs, persistence, models and browser policy
+web/             Vanilla HTML/CSS/JavaScript companion interface
+tests/           Domain, provider, ownership, replay, HTTP and browser-policy tests
+integrations/    Restricted Hermes plugin bridge
+evals/           Narrow offline text-routing evaluation
+docs/            Current engineering pack, release evidence and historical ADRs/specs
+tasks/           Earlier delivery plans; current selection comes from docs/backlog.md
+skills/          Domain engineering guides
+deploy/gcp/      Non-secret deployment target/environment configuration
+data/, artifacts/ Generated local state/evidence, ignored by Git
 ```

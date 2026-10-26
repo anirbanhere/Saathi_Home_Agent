@@ -6,6 +6,8 @@ Last updated: 26 October 2026, Asia/Kolkata.
 - Three domains: everyday tasks first, then cooking and inventory. Original languages: Tamil, Malayalam, Kannada, Hindi; English is also required.
 - Intended primary interface: WhatsApp voice. Immediate delivery priority: a public website with running Python and executable model-driven tools.
 - Models must be interchangeable. Initial preference is OpenRouter free inference, with a Meta adapter once access is ready. No automatic paid fallback.
+- Nous candidate models were catalogued but the human explicitly skipped credential setup/testing. Do not request that setup again or treat it as a required dependency unless reopened.
+- Keep the engineering documentation in this same source repository. Claude continuation starts with CLAUDE.md, HANDOFF.md and docs/README.md; current development tickets and proposed sprint scope live in docs/backlog.md and docs/sprint-plan.md.
 - Task execution uses a hybrid approach: reuse reliable APIs, inspect suitable public sites through an isolated browser, and hand off account/checkout steps. End users should not need their own developer API key for every task. Operator-managed providers remain useful when browser access is blocked or unreliable.
 - Public browser execution is a private Cloud Run service without household storage or model/railway secrets. It accepts structured read actions only, with fresh contexts and public-IP egress checks. Website research steps save source evidence and can resume; they do not yet run after the client closes.
 - Bills and food orders can have unverified handoff drafts; no real money or orders are executed. Strong identity, account sessions and a durable transaction store precede financial automation.

@@ -1,5 +1,7 @@
 # Implementation status — 26 October 2026
 
+Current consolidated capability matrix and evidence: [current-state.md](current-state.md). The original local-edition details below remain historical scope-specific evidence. [Documentation index](README.md) maps the full continuation pack.
+
 Hybrid update: the public site now includes isolated Chromium page inspection, saved/resumable research, assistant-to-research routing and bill/food checkout handoff drafts. Actual browser navigation/form actions and public website persistence were verified. The permitted free model still returns 429; no successful live AI research answer is claimed. The Hermes plugin's registration/handler is tested, but a real Hermes session is not connected. See [hybrid implementation and operations](hybrid-browser.md).
 
 Hosted update: the Python Cloud Run website, free-model tool loop, visitor isolation, and durable snapshots are documented in [hosted-deployment.md](hosted-deployment.md). The original local prototype evidence below remains valid for that edition. Consult HANDOFF.md for live inference availability and the latest release checks.

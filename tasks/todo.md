@@ -1,5 +1,7 @@
 # Proposed implementation checklist
 
+Historical checklist: use [docs/backlog.md](../docs/backlog.md) and [docs/sprint-plan.md](../docs/sprint-plan.md) for current task selection. Checked/unchecked items below retain the original prototype scope, not the latest public release state.
+
 Status: Local implementation completed for bounded offline workflows; live integration and submission items remain pending. See ../docs/implementation-status.md. File paths below were proposed before implementation; actual code is in home_agent/ and web/.
 Each task should remain within roughly five implementation files; split any larger task before coding. Establish executable dev/test commands in Task 2 rather than inventing successful commands now.
 

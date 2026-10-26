@@ -1,5 +1,7 @@
 # Home Agents voice-first delivery plan
 
+Current cross-domain delivery and sprint selection: [roadmap](../docs/roadmap.md), [sprints](../docs/sprint-plan.md), [backlog](../docs/backlog.md). This file preserves the earlier voice/clinic proposal and its acceptance ideas.
+
 Current delivery priority: [hybrid-agent-plan.md](hybrid-agent-plan.md), authorized after the user requested broader browser-based execution. This file preserves the voice/appointment roadmap.
 
 Date: 26 October 2026. Status: planned, not implemented.

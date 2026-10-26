@@ -1,5 +1,7 @@
 # Hybrid agent delivery
 
+This browser-release plan retains completion evidence. Select new work from [docs/backlog.md](../docs/backlog.md) and [docs/sprint-plan.md](../docs/sprint-plan.md); see the consolidated [roadmap](../docs/roadmap.md).
+
 Current priority: public browser capability and resumable tasks, preserving existing live train/kitchen features. See `../docs/hybrid-agent-spec.md`.
 
 1. Browser policy and worker contracts; tests first.

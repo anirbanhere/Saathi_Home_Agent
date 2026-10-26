@@ -1,6 +1,6 @@
 # Proposed build plan: Home Agent hackathon demo
 
-Current delivery sequence: [voice-first-plan.md](voice-first-plan.md). The revised product design prioritizes voice-led demo clinic booking, interchangeable models, and GCP. This document preserves the earlier prototype plan.
+Current delivery sequence: [roadmap](../docs/roadmap.md), [sprint plan](../docs/sprint-plan.md) and [backlog](../docs/backlog.md). This document and [voice-first-plan.md](voice-first-plan.md) preserve earlier prototype/voice planning; the working public Cloud Run/hybrid release supersedes their original ordering.
 
 Status: User authorized implementation. The local prototype is built; see ../docs/implementation-status.md for evidence and remaining integrations. This file preserves the proposed delivery plan.
 Updated: 26 October 2026, IST.
