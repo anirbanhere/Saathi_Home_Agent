@@ -1,0 +1,10 @@
+[project]
+name = "home-agent-demo"
+version = "0.1.0"
+description = "A local, transparent household agent demo with Hermes MCP tools"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.home-agent]
+test-command = "python -m unittest discover -s tests -v"
+dev-command = "python -m home_agent"
