@@ -32,6 +32,8 @@ class Store:
                 id TEXT PRIMARY KEY, name TEXT, delta REAL, unit TEXT, source TEXT, estimated INTEGER,
                 created_at TEXT)""")
             db.execute("CREATE TABLE IF NOT EXISTS receipts (id TEXT PRIMARY KEY, fingerprint TEXT, result TEXT)")
+            db.execute("""CREATE TABLE IF NOT EXISTS stock_corrections (
+                id TEXT PRIMARY KEY, name TEXT, quantity REAL, unit TEXT, result TEXT)""")
             if not db.execute("SELECT 1 FROM settings WHERE key='seeded'").fetchone():
                 for name, quantity, unit in SEED_STOCK:
                     db.execute("INSERT INTO inventory VALUES (?, ?, ?)", (name, quantity, unit))

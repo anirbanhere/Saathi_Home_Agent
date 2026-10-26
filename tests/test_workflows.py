@@ -107,6 +107,33 @@ class WorkflowTests(unittest.TestCase):
         self.app.tool("dish_suggestions", {})
         self.assertEqual(before, self.app.snapshot()["inventory"])
 
+    def test_correction_reference_replay_and_conflicting_payload(self):
+        first = self.app.correct_stock("rice", 500, "g", "correction-1")
+        self.app.import_receipt("Rice,1,kg", "later-bill")
+        self.assertEqual(self.app.correct_stock("rice", 500, "g", "correction-1"), first)
+        with self.assertRaises(AppError):
+            self.app.correct_stock("rice", 100, "g", "correction-1")
+
+    def test_invalid_tool_types_are_public_validation_errors(self):
+        for name, args in [([], {}), ("recipe_plan", {"recipe": "dal", "language": []})]:
+            with self.assertRaises(AppError):
+                self.app.tool(name, args)
+
+    def test_less_spicy_reduces_chilli_even_for_a_single_chilli_recipe(self):
+        normal = self.app.tool("recipe_plan", {"recipe": "dal", "servings": 2})
+        mild = self.app.tool("recipe_plan", {"recipe": "dal", "servings": 2, "less_spicy": True})
+        normal_chilli = next(i["quantity"] for i in normal["result"]["ingredients"] if i["name"] == "chilli")
+        mild_chilli = next(i["quantity"] for i in mild["result"]["ingredients"] if i["name"] == "chilli")
+        self.assertEqual(mild_chilli, normal_chilli / 2)
+
+    def test_unknown_dish_is_clarified_instead_of_replaced(self):
+        first = self.app.message("Cook biryani for 2", "en", "unknown-dish", "one")
+        self.assertEqual(first["task"]["status"], "needs_input")
+        self.assertNotIn("ingredients", first["task"]["result"])
+        second = self.app.message("dal for 2", "en", "unknown-dish", "two")
+        self.assertEqual(second["task"]["id"], first["task"]["id"])
+        self.assertEqual(second["task"]["result"]["recipe"], "dal")
+
 
 if __name__ == "__main__":
     unittest.main()

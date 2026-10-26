@@ -26,6 +26,8 @@ TOOL_ARGS = {
 
 def valid_date(value) -> str:
     value = text(value, "date", 10)
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+        raise AppError("Use a valid date in YYYY-MM-DD format.")
     try:
         return date.fromisoformat(value).isoformat()
     except ValueError:
@@ -44,8 +46,6 @@ def normalize_item(name, quantity, unit):
         unit = {"kg": "g", "l": "ml"}[unit]
     if unit not in {"g", "ml", "pcs"}:
         raise AppError("Supported units are g, kg, ml, l and pcs.")
-    if unit == "pcs" and quantity != int(quantity):
-        raise AppError("Piece quantities must be whole numbers.")
     if quantity > 1_000_000:
         raise AppError("Quantity exceeds the demo limit.")
     return name, round(quantity, 4), unit
@@ -57,7 +57,7 @@ class HomeAgent:
 
     @staticmethod
     def _actor(actor):
-        if actor not in {"owner", "cook"}:
+        if not isinstance(actor, str) or actor not in {"owner", "cook"}:
             raise AppError("Unknown household role.", 403, "FORBIDDEN")
 
     @staticmethod
@@ -93,14 +93,14 @@ class HomeAgent:
 
     def tool(self, name, args, actor="owner"):
         self._actor(actor)
-        if name not in TOOL_ARGS:
+        if not isinstance(name, str) or name not in TOOL_ARGS:
             raise AppError("Unknown or prohibited tool.", 403, "TOOL_NOT_ALLOWED")
         if not isinstance(args, dict) or set(args) - TOOL_ARGS[name]:
             raise AppError("Unexpected tool arguments.")
         if actor == "cook" and name not in HOUSEHOLD_TOOLS:
             raise AppError("The cook may only access recipes and inventory.", 403, "FORBIDDEN")
         language = args.get("language", "en")
-        if language not in LANGUAGES:
+        if not isinstance(language, str) or language not in LANGUAGES:
             raise AppError("Unsupported language.")
         with self.store.transaction() as db:
             return self._tool(db, name, args, actor, language)
@@ -158,8 +158,7 @@ class HomeAgent:
                 needed = quantity * servings / recipe["servings"]
                 if item == "chilli" and less_spicy:
                     needed /= 2
-                if unit == "pcs":
-                    needed = max(1, round(needed))
+                needed = round(needed, 2)
                 available = inventory.get(item, {}).get("quantity", 0)
                 ingredients.append({"name": item, "quantity": needed, "unit": unit,
                                     "available": available, "missing": max(0, needed - available)})
@@ -252,12 +251,20 @@ class HomeAgent:
         name, quantity, unit = normalize_item(name, quantity, unit)
         reference = text(reference, "correction reference", 100)
         with self.store.transaction() as db:
+            previous = db.execute("SELECT * FROM stock_corrections WHERE id=?", (reference,)).fetchone()
+            if previous:
+                if (previous["name"], previous["quantity"], previous["unit"]) != (name, quantity, unit):
+                    raise AppError("Correction reference already used with different contents.", 409, "CONFLICT")
+                return json.loads(previous["result"])
             current = db.execute("SELECT * FROM inventory WHERE name=?", (name,)).fetchone()
             if current and current["unit"] != unit:
                 raise AppError("Correction must use the item's existing unit.")
             self.store.stock_event(db, "correction:" + reference, name, quantity - (current["quantity"] if current else 0),
                                    unit, "Manual stock correction")
-            return dict(db.execute("SELECT * FROM inventory WHERE name=?", (name,)).fetchone())
+            result = dict(db.execute("SELECT * FROM inventory WHERE name=?", (name,)).fetchone())
+            db.execute("INSERT INTO stock_corrections VALUES (?, ?, ?, ?, ?)",
+                       (reference, name, quantity, unit, json.dumps(result)))
+            return result
 
     def complete_meal(self, task_id, actor="owner"):
         self._actor(actor)
@@ -280,7 +287,7 @@ class HomeAgent:
         content = text(content, "message", 4000)
         session = text(session, "session", 100)
         request_id = text(request_id or uuid4().hex, "request id", 100)
-        if language not in LANGUAGES:
+        if not isinstance(language, str) or language not in LANGUAGES:
             raise AppError("Unsupported language.")
         if language == "en":
             language = detect_language(content, language)
@@ -343,11 +350,25 @@ class HomeAgent:
                     args["account"] = account.group()
                     task = self._tool(db, intent, args, "owner", language, session, pending["id"] if pending else None)
             elif intent == "recipe_plan":
-                key = "upma" if "upma" in lower else "dal" if "dal" in lower else "tomato-rice"
+                key = None
+                for recipe_key, words in [
+                    ("upma", ["upma", "உப்புமா", "ഉപ്പുമാവ്", "ಉಪ್ಪಿಟ್ಟು", "उपमा"]),
+                    ("dal", ["dal", "பருப்பு", "പരിപ്പ്", "ಬೇಳೆ", "दाल"]),
+                    ("tomato-rice", ["tomato", "தக்காளி", "തക്കാളി", "ಟೊಮೆಟೊ", "टमाटर"]),
+                ]:
+                    if any(word in lower for word in words):
+                        key = recipe_key
+                        break
                 servings = re.search(r"(?:for|பேர்|പേർ|ಜನ|लोग)\s*(\d{1,2})", lower)
-                args.update(recipe=key, servings=int(servings.group(1)) if servings else 2,
-                            less_spicy=any(word in lower for word in ["less", "mild", "காரம் குறை", "എരിവ് കുറ", "ಖಾರ ಕಡಿಮೆ", "कम तीखा"]))
-                task = self._tool(db, intent, args, "owner", language, session)
+                args.update(servings=int(servings.group(1)) if servings else args.get("servings", 2),
+                            less_spicy=args.get("less_spicy", False) or any(word in lower for word in ["less", "mild", "காரம் குறை", "എരിവ് കുറ", "ಖಾರ ಕಡಿಮೆ", "कम तीखा"]))
+                if key:
+                    args["recipe"] = key
+                    task = self._tool(db, intent, args, "owner", language, session, pending["id"] if pending else None)
+                else:
+                    reply = say(language, "recipe_prompt")
+                    task = self.store.save_task(db, intent, "owner", args, {"summary": reply, "mode": "curated"},
+                                                "needs_input", session, pending["id"] if pending else None)
             elif intent in {"dish_suggestions", "inventory_list"}:
                 task = self._tool(db, intent, args, "owner", language, session)
             elif intent != "booking_help":
