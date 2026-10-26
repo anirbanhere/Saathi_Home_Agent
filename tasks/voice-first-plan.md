@@ -1,5 +1,7 @@
 # Home Agents voice-first delivery plan
 
+Current delivery priority: [hybrid-agent-plan.md](hybrid-agent-plan.md), authorized after the user requested broader browser-based execution. This file preserves the voice/appointment roadmap.
+
 Date: 26 October 2026. Status: planned, not implemented.
 Design authority: `../docs/home-agents-redesign.md`.
 
