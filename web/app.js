@@ -525,15 +525,23 @@ function renderConnections() {
   const data = state.data.integrations;
   const models = Array.isArray(data.models) ? data.models : [];
   const catalog = data.model_catalog;
+  const selectedModel = models.includes($("#model-select").value) ? $("#model-select").value : data.model;
+  const health = data.model_health?.[selectedModel];
+  const availabilityLabel = {
+    unobserved: "Inference not yet observed", responding: "Last request responded",
+    rate_limited: "Last request rate-limited", auth_error: "Credential rejected",
+    permission_denied: "Request denied", invalid_response: "Last response unusable",
+    unavailable: "Last request unavailable", stale: "Availability unverified",
+  }[health?.state] || "Inference unverified";
   const list = $("#connections-list");
   list.replaceChildren();
   const rows = [
     ["Public browser", "Reads public websites in an isolated Chromium worker. Account logins and transactions require handoff.", data.browser?.configured ? "Connected · public pages" : "Not connected", data.browser?.configured],
     [
       "Free AI · OpenRouter",
-      "Live reasoning, tool calls and tool observations. Only free models are allowed; availability and quotas vary.",
-      data.openrouter ? `${models.length} permitted free models` : "Not configured",
-      data.openrouter && models.length > 0,
+      "Only permitted free models are allowed. A configured key does not guarantee provider capacity or a completed task.",
+      data.openrouter ? (models.length ? availabilityLabel : "No permitted models") : "Not configured",
+      data.openrouter && models.length > 0 && health?.state === "responding",
     ],
     [
       "Meta Muse",
@@ -613,6 +621,10 @@ function renderConnections() {
   $("#model-access-note").textContent = catalog?.message
     ? `${catalog.message} Access settings refresh within one minute; reload after saving changes.`
     : "Free AI is not configured for this application.";
+  const checkedAt = health?.checked_at ? new Date(health.checked_at).toLocaleString("en-IN", {timeZone: "Asia/Kolkata"}) + " IST" : null;
+  $("#model-health-note").textContent = health
+    ? `${availabilityLabel}. ${health.message}${checkedAt ? ` Last observed: ${checkedAt}.` : ""} Refreshing status does not make a model request.`
+    : "No inference observation is available here. Refreshing status does not make a model request.";
   if (!state.engineInitialized) {
     $("#engine").value = data.openrouter ? "openrouter" : "offline";
     state.engineInitialized = true;
@@ -637,12 +649,12 @@ function renderConnections() {
   $("#research-note").textContent = data.browser?.configured
     ? "Public browser connected. Login, payment, ordering and CAPTCHA steps require human handoff. Closing this tab pauses further steps; resume in task history. AI research uses the free model selected in Connections."
     : "Public browser is not connected in this environment. Configure the private worker to enable research.";
-  $("#mode-title").textContent = $("#engine").value === "openrouter" ? (models.length ? "Free AI configured" : "Free AI needs model access") :
+  $("#mode-title").textContent = $("#engine").value === "openrouter" ? (models.length ? availabilityLabel : "Free AI needs model access") :
     $("#engine").value === "muse" ? "Muse selected" : "Offline demo";
   const trainLabel = data.train?.provider === "railradar" ? (data.train.configured ? "RailRadar train reports" : "Railway API key needed") : "Sample train data";
   $("#mode-description").textContent =
     $("#engine").value === "openrouter"
-      ? (models.length ? "Key-permitted models only · Provider capacity varies · Sandbox travel & payments" : catalog?.message || "No permitted free model is available.")
+      ? (models.length ? health?.message || "Free model access configured; inference is unverified. Direct tools remain available." : catalog?.message || "No permitted free model is available.")
       : $("#engine").value === "muse"
       ? `Direct Meta API adapter · ${trainLabel} · Sandbox transactions`
       : `Limited phrase matching · ${trainLabel} · Sandbox transactions`;
@@ -666,6 +678,7 @@ async function sendMessage(value) {
     if (response.task?.kind === "web_research") await continueResearch(response.task);
   } catch (error) {
     toast(error.message, true);
+    await refresh().catch(() => {});
   } finally {
     state.busy = false;
     $("#send-message").disabled = false;
@@ -782,6 +795,8 @@ $("#new-chat").addEventListener("click", () =>
   }),
 );
 $("#engine").addEventListener("change", renderConnections);
+$("#model-select").addEventListener("change", renderConnections);
+$("#refresh-connections").addEventListener("click", (event) => run(refresh, event.currentTarget));
 $("#language").value = localStorage.getItem("home-agent-language") || "en";
 $("#language").addEventListener("change", () =>
   localStorage.setItem("home-agent-language", $("#language").value),

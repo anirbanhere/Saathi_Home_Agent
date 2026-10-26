@@ -10,7 +10,9 @@ from urllib.parse import urlsplit
 from flask import Flask, g, jsonify, request, send_from_directory
 from werkzeug.exceptions import HTTPException
 
-from .agent_loop import FreeModelAgent, free_model
+from .agent_loop import FreeModelAgent
+from .model_adapters import ModelProfile, free_model
+from .model_health import ModelHealth
 from .cloud_state import VisitorState
 from .errors import AppError, text
 from .server import STATIC
@@ -39,12 +41,13 @@ class Limits:
             events.append(stamp)
 
 
-def create_app(repository=None, model_catalog=None, browser=None):
+def create_app(repository=None, model_catalog=None, browser=None, model_health=None):
     app = Flask(__name__, static_folder=None)
     app.config["MAX_CONTENT_LENGTH"] = 32_000
     repository = repository or VisitorState()
     model_catalog = model_catalog or ModelCatalog()
     limits = Limits()
+    model_health = model_health or ModelHealth()
 
     def model_budget():
         limits.consume("model-minute", 15, 60)
@@ -55,7 +58,7 @@ def create_app(repository=None, model_catalog=None, browser=None):
         limits.consume("browser-day", 100, 86400)
 
     browser = browser or BrowserClient(before_request=browser_budget)
-    research = ResearchTasks(browser)
+    research = ResearchTasks(browser, on_result=model_health.record)
 
     def authorize_model(model):
         free_model(model)
@@ -124,6 +127,7 @@ def create_app(repository=None, model_catalog=None, browser=None):
         result["integrations"] = {
             "hosted": True, "openrouter": bool(os.environ.get("OPENROUTER_API_KEY")), "muse": False,
             "model": selected, "models": catalog["models"], "model_catalog": catalog,
+            "model_health": {model: model_health.status(ModelProfile("openrouter", model)) for model in catalog["models"]},
             "asr": False, "tts": False, "hermes": "Not connected; bounded application tool loop active",
             "whatsapp": "Not connected", "travel": "Live provider adapter" if train_configuration()["configured"] else "Train provider not connected" if train_configuration()["provider"] == "railradar" else "Sample data", "payments": "Sandbox",
             "train": train_configuration(),
@@ -157,7 +161,7 @@ def create_app(repository=None, model_catalog=None, browser=None):
                     model = data.get("model") or (preferred if preferred in catalog["models"] else catalog["models"][0])
                     if model not in catalog["models"]:
                         raise AppError("This model is not permitted by the configured API key. Refresh Connections and select an allowed free model. To enable it, update the key's OpenRouter guardrails.", 403, "MODEL_NOT_ALLOWED")
-                    result = FreeModelAgent(model=model, before_request=model_budget, research=research).message(agent, content, language, session, request_id)
+                    result = FreeModelAgent(model=model, before_request=model_budget, research=research, on_result=model_health.record).message(agent, content, language, session, request_id)
                 elif engine == "offline":
                     result = agent.message(content, language, session, request_id)
                 else:
