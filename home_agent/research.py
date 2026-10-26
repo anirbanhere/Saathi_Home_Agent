@@ -5,7 +5,7 @@ import hashlib
 import json
 from uuid import uuid4
 
-from .agent_loop import free_model
+from .model_adapters import CompletionRequest, OpenRouterAdapter, free_model
 from .browser_client import BrowserClient
 from .browser_policy import public_url, validate_actions
 from .errors import AppError, text
@@ -77,8 +77,9 @@ HANDOFF_SCHEMA = {
 
 
 class ResearchTasks:
-    def __init__(self, browser=None):
+    def __init__(self, browser=None, on_result=None):
         self.browser = browser or BrowserClient()
+        self.on_result = on_result
 
     def start(
         self,
@@ -221,32 +222,33 @@ class ResearchTasks:
                 "Never claim a purchase/payment/booking happened. Ask for handoff when access or evidence is insufficient. "
                 "Respond in the user's language. Current UTC time: " + now()
             )
-            payload = {
-                "model": task["args"]["model"],
-                "messages": [
-                    {"role": "system", "content": system},
-                    {
-                        "role": "user",
-                        "content": json.dumps(
-                            {
-                                "goal": task["args"]["goal"],
-                                "pages": evidence,
-                                "trace": result["trace"],
-                            },
-                            ensure_ascii=False,
-                        ),
-                    },
-                ],
-                "tools": [BROWSE_SCHEMA, FINISH_SCHEMA, HANDOFF_SCHEMA],
-                "tool_choice": "auto",
-                "max_tokens": 1400,
-                "provider": {"require_parameters": True},
-            }
-            raw = post_json(
-                "https://openrouter.ai/api/v1/chat/completions", payload, key
+            messages = [
+                {"role": "system", "content": system},
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "goal": task["args"]["goal"],
+                            "pages": evidence,
+                            "trace": result["trace"],
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
+            ]
+            completion = OpenRouterAdapter(
+                key,
+                task["args"]["model"],
+                transport=post_json,
+                on_result=self.on_result,
+            ).complete(
+                CompletionRequest(
+                    messages=messages,
+                    tools=[BROWSE_SCHEMA, FINISH_SCHEMA, HANDOFF_SCHEMA],
+                )
             )
             try:
-                calls = raw["choices"][0]["message"]["tool_calls"]
+                calls = completion.message["tool_calls"]
                 if not isinstance(calls, list) or len(calls) != 1:
                     raise ValueError()
                 function = calls[0]["function"]

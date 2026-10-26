@@ -11,6 +11,7 @@ from .integrations import post_json
 from .languages import LANGUAGES
 from .service import TOOL_ARGS
 from .store import now
+from .model_adapters import CompletionRequest, OpenRouterAdapter, free_model
 
 RESEARCH_START_SCHEMA = {"type": "function", "function": {
     "name": "start_web_research",
@@ -18,22 +19,17 @@ RESEARCH_START_SCHEMA = {"type": "function", "function": {
     "parameters": {"type": "object", "properties": {"goal": {"type": "string", "maxLength": 2000}, "url": {"type": "string", "maxLength": 2000}}, "required": ["goal"], "additionalProperties": False}}}
 
 
-def free_model(model):
-    if not isinstance(model, str) or not (model == "openrouter/free" or model.endswith(":free")):
-        raise AppError("Only OpenRouter free models are enabled.", 422, "PAID_MODEL_DISABLED")
-    if len(model) > 160 or any(c.isspace() for c in model):
-        raise AppError("Invalid model identifier.")
-    return model
-
-
 class FreeModelAgent:
-    def __init__(self, key=None, model=None, before_request=None, research=None):
+    def __init__(self, key=None, model=None, before_request=None, research=None, adapter=None, on_result=None):
         self.key = os.environ.get("OPENROUTER_API_KEY", "") if key is None else key
         if not self.key:
             raise AppError("The free AI connection is not configured yet.", 503, "NOT_CONFIGURED")
         self.model = free_model(model or os.environ.get("OPENROUTER_MODEL", "openrouter/free"))
         self.before_request = before_request or (lambda: None)
         self.research = research
+        self.adapter, self.on_result = adapter, on_result
+        if adapter is not None and (adapter.profile.provider != "openrouter" or adapter.profile.model != self.model):
+            raise AppError("The completion adapter must match this free-model profile.", 503, "CONFIGURATION_ERROR")
 
     def message(self, app, content, language, session, request_id=None):
         content = text(content, "message", 4000)
@@ -48,6 +44,8 @@ class FreeModelAgent:
             if previous["fingerprint"] != fingerprint:
                 raise AppError("Message reference already has different contents.", 409, "CONFLICT")
             return json.loads(previous["response"])
+
+        adapter = self.adapter or OpenRouterAdapter(self.key, self.model, transport=post_json, on_result=self.on_result)
 
         snapshot = app.snapshot(session=session)
         date = datetime.now(timezone(timedelta(hours=5, minutes=30))).date().isoformat()
@@ -85,19 +83,16 @@ class FreeModelAgent:
         for iteration in range(3):
             try:
                 self.before_request()
-                raw = post_json("https://openrouter.ai/api/v1/chat/completions", {
-                    "model": self.model, "messages": messages, "tools": tools,
-                    "tool_choice": "auto" if len(trace) < 2 and iteration < 2 else "none",
-                    "max_tokens": 1400, "provider": {"require_parameters": True},
-                }, self.key)
+                completion = adapter.complete(CompletionRequest(messages=messages, tools=tools,
+                    tool_choice="auto" if len(trace) < 2 and iteration < 2 else "none"))
             except AppError:
                 if task:
                     notice += " Model follow-up unavailable; showing the verified tool result."
                     break
                 raise
             try:
-                message = raw["choices"][0]["message"]
-                provider_model = raw.get("model", self.model)
+                message = completion.message
+                provider_model = completion.model
                 calls = message.get("tool_calls") or []
                 if not isinstance(calls, list) or len(calls) > 2:
                     raise ValueError()
