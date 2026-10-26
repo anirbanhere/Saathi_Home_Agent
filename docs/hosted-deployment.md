@@ -45,7 +45,7 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 ## Deployment record
 
 - URL: https://home-agents-xswei7prnq-uc.a.run.app . Public invocation is scoped to this Cloud Run service.
-- Current ready revision: `home-agents-00003-qzh`; image build `4da2e8be-7c97-441a-a9c3-8f5a14a905c5`. Previous verified working revision: `home-agents-00002-cjn`.
+- Current ready revision: `home-agents-00004-7mn`; image build `8c3e9e77-66ad-4c41-8fa7-73bd1c34820c`. Previous working revision: `home-agents-00003-qzh` (older fixed model selector).
 - First revision had a malformed combined environment value from PowerShell; the YAML configuration corrected it. Use the second verified revision, not the first, for rollback.
 - Public HTTPS checks passed: health, synthetic recipe plan and meal completion, saved inventory, persisted sandbox approval with duplicate protection, and separate anonymous visitor state.
 - 48 Python tests passed. JavaScript syntax/markup checks passed. Hosted dependency audit reported no known vulnerabilities.
@@ -54,3 +54,4 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 - Final hosted UI loaded correctly, including provider choice and server-storage labels. No console errors/warnings were present after the successful page load. A narrow browser viewport had no horizontal overflow; a requested 390px window was constrained to 500px, so this does not establish a 390px device test.
 - Canonical source repository: https://github.com/anirbanhere/Saathi_Home_Agent . Source, agent context files and history are synchronized to `main`, with GitHub Actions enabled. CI passed for `83dde072139063e1134a7aa07cb44ae86bb912e3`: https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40336291687 . Repository-documentation changes do not change the deployed image.
 - Final synthetic inference request through the public website still returned the truthful HTTP 429 response. Live model-to-tool acceptance remains pending; no paid or offline fallback was substituted.
+- Model-permission fix verified on the public service: catalog is authenticated/verified and lists only Gemma 4 26B for the current key; a stale NVIDIA selection returns 403 `MODEL_NOT_ALLOWED` before inference. 54 Python tests and JavaScript syntax checks passed. Fix CI: https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40337885812 . This fixes selection/error handling; it does not enable a model blocked in the provider account or create a live train-status integration.
