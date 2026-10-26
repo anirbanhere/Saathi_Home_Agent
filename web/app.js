@@ -5,6 +5,7 @@ const state = {
   session: localStorage.getItem("home-agent-session") || "demo",
   busy: false,
   approval: null,
+  engineInitialized: false,
 };
 const titles = {
   assistant: [
@@ -21,7 +22,7 @@ const titles = {
   ],
   connections: [
     "A home for your connections.",
-    "See exactly what’s running locally and what still needs connecting.",
+    "See which services are available and choose your AI model.",
   ],
 };
 const prompts = {
@@ -105,7 +106,7 @@ async function api(path, body) {
   try {
     data = await response.json();
   } catch {
-    throw new Error("The local server returned an invalid response.");
+    throw new Error("The server returned an invalid response. Please retry.");
   }
   if (!response.ok)
     throw new Error(
@@ -212,7 +213,9 @@ function renderChat() {
       "message-meta",
       response.mode === "offline"
         ? "Offline template"
-        : "Muse · tool-backed results are labeled",
+        : response.mode === "openrouter"
+          ? `${response.model} · ${response.verified_actions || 0} verified tool results`
+          : "Muse · tool-backed results are labeled",
     );
     if (state.data.integrations.tts) {
       const listen = el("button", "listen-button", "Listen ↗");
@@ -223,6 +226,16 @@ function renderChat() {
       meta.append(listen);
     }
     wrap.append(meta);
+    if (response.mode === "openrouter") {
+      const evidence = el("details", "task-detail");
+      evidence.append(el("summary", "", "Agent actions & limits"));
+      evidence.append(el("p", "small-muted", response.notice));
+      const trace = el("ol");
+      (response.trace || []).forEach((step) => trace.append(el("li", "", `${taskNames[step.tool] || step.tool} · ${statusNames[step.status] || step.status}`)));
+      if (!trace.childElementCount) evidence.append(el("p", "small-muted", "Conversation only. No tool action was executed."));
+      else evidence.append(trace);
+      wrap.append(evidence);
+    }
     if (response.task) {
       wrap.append(taskCard(currentTask));
     }
@@ -455,15 +468,21 @@ function renderConnections() {
   list.replaceChildren();
   const rows = [
     [
+      "Free AI · OpenRouter",
+      "Live reasoning, tool calls and tool observations. Only free models are allowed; availability and quotas vary.",
+      data.openrouter ? "Connected · free models only" : "Not configured",
+      data.openrouter,
+    ],
+    [
       "Meta Muse",
-      data.model + " · direct API adapter",
+      data.hosted ? "Separate Meta adapter available; this website currently uses OpenRouter." : data.model + " · direct API adapter",
       data.muse ? "Key configured · unverified" : "Needs API key",
       data.muse,
     ],
     [
-      "Hermes Agent",
-      "MCP tool server included. Connect using the documented configuration.",
-      "Adapter ready · not connected",
+      "Agent runtime",
+      data.hosted ? "Bounded tool/observation loop is active. Hermes MCP integration remains available for a later connection." : "MCP tool server included. Connect using the documented configuration.",
+      data.hosted ? "Application loop active" : "Adapter ready · not connected",
       false,
     ],
     [
@@ -486,14 +505,14 @@ function renderConnections() {
     ],
     [
       "Travel & payments",
-      "Train examples and transaction simulators run on this computer.",
+      "Train examples and transaction simulators; no real money moves and no tickets are issued.",
       "Fixtures & sandbox",
       false,
     ],
     [
       "Kitchen memory",
-      "SQLite stores purchases, corrections and estimated meal consumption.",
-      "Local storage active",
+      data.hosted ? "Private per-visitor state saves purchases, corrections and meal estimates on the server. This browser's cookie grants access; workspaces are separate." : "SQLite stores purchases, corrections and estimated meal consumption.",
+      data.hosted ? "Server storage active" : "Local storage active",
       true,
     ],
     [
@@ -514,13 +533,31 @@ function renderConnections() {
     list.append(row);
   }
   $("#engine").querySelector('[value="muse"]').disabled = !data.muse;
+  $("#engine").querySelector('[value="openrouter"]').disabled = !data.openrouter;
+  if (!state.engineInitialized) {
+    $("#engine").value = data.openrouter ? "openrouter" : "offline";
+    if ([...$("#model-select").options].some((option) => option.value === data.model)) $("#model-select").value = data.model;
+    state.engineInitialized = true;
+  }
+  $("#model-select").disabled = $("#engine").value !== "openrouter";
+  $("#runtime-label").textContent = data.hosted ? "Live Python app" : "Local prototype";
+  $("#workspace-description").textContent = data.hosted ? "Your private demo workspace" : "Local demo workspace";
+  $("#storage-label").textContent = data.hosted ? "Saved privately on the server" : "Saved on this computer";
+  $("#connections-description").textContent = data.hosted
+    ? "Choose your free AI model below. Kitchen data and task records are saved in your private browser workspace on the server."
+    : "The local application works independently. Services below require their own configuration and validation.";
+  $("#engine-hint").textContent = data.hosted
+    ? "Free AI uses real model inference and tools. Offline mode uses a limited phrase matcher. Free provider capacity and account permissions can vary."
+    : "The direct Muse adapter tests the same tool contracts. Hermes uses the separate MCP adapter; selecting Muse here does not run Hermes.";
   $("#speech-note").textContent = data.asr
     ? "Indic endpoint configured"
     : "Speech service not connected";
-  $("#mode-title").textContent =
+  $("#mode-title").textContent = $("#engine").value === "openrouter" ? "Free AI agent connected" :
     $("#engine").value === "muse" ? "Muse selected" : "Offline demo";
   $("#mode-description").textContent =
-    $("#engine").value === "muse"
+    $("#engine").value === "openrouter"
+      ? "Live model + executable tools · Saved kitchen state · Sandbox travel & payments"
+      : $("#engine").value === "muse"
       ? "Direct Meta API adapter · Sample train data · Sandbox transactions"
       : "Limited phrase matching · Sample train data · Sandbox transactions";
 }
@@ -536,6 +573,7 @@ async function sendMessage(value) {
       session: state.session,
       request_id: crypto.randomUUID(),
       engine: $("#engine").value,
+      model: $("#model-select").value,
     });
     $("#message").value = "";
     await refresh();

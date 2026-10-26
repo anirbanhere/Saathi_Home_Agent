@@ -1,0 +1,10 @@
+*
+!Dockerfile
+!requirements-hosted.txt
+!cloudbuild.yaml
+!home_agent/
+!home_agent/**
+!web/
+!web/**
+home_agent/__pycache__/
+home_agent/**/*.pyc
