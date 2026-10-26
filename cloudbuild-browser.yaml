@@ -1,0 +1,9 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['build', '-f', 'Browser.Dockerfile', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/home-agents/browser:$BUILD_ID', '.']
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/home-agents/browser:$BUILD_ID'
+logsBucket: gs://sathi-home-agent-build-59012364414/logs
+options:
+  logging: GCS_ONLY
+timeout: 1200s

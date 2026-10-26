@@ -2,6 +2,9 @@
 !Dockerfile
 !requirements-hosted.txt
 !cloudbuild.yaml
+!cloudbuild-browser.yaml
+!Browser.Dockerfile
+!requirements-browser.txt
 !home_agent/
 !home_agent/**
 !web/
