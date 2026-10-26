@@ -1,5 +1,7 @@
 # Home Agent: Meta hackathon demo specification
 
+Current design update: [home-agents-redesign.md](home-agents-redesign.md) supersedes this document's workflow ordering and fixed-model assumptions. Appointment booking against an owned demo clinic calendar is now the hero workflow; all four original languages and all three domains remain in scope. This file preserves the earlier prototype specification.
+
 Status: Local prototype implemented following user authorization. The full hackathon scope below remains a target; see implementation-status.md for completed and pending capabilities.
 Updated: 26 October 2026, Asia/Kolkata.
 
