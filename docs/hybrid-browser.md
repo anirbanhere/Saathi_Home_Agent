@@ -1,6 +1,6 @@
 # Hybrid browser implementation and operations
 
-Implemented 26 October 2026, Asia/Kolkata. [Product spec](hybrid-agent-spec.md), [delivery plan](../tasks/hybrid-agent-plan.md).
+Implemented 26 October 2026, Asia/Kolkata. Later model-adapter/status releases are recorded in [current state](current-state.md) and [adapter notes](model-adapters.md); deployment IDs below retain the initial hybrid checkpoint. [Product spec](hybrid-agent-spec.md), [delivery plan](../tasks/hybrid-agent-plan.md).
 
 ## What is available
 
@@ -32,7 +32,7 @@ Model answers require an exact quote from an inspected page, linked to its URL/t
 
 ## Cloud resources
 
-- Website revision: `home-agents-00007-r6f`; image build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`.
+- Initial hybrid website revision: `home-agents-00007-r6f`; image build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`.
 - Private worker service: `home-agents-browser`, `us-central1`.
 - Worker URL: `https://home-agents-browser-59012364414.us-central1.run.app` (IAM required).
 - Worker revision: `home-agents-browser-00001-w2m`; image build `0604bf8b-5c08-4f48-84d5-a2b4d8f5f07f`.

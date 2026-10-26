@@ -16,6 +16,7 @@ Read [AGENTS.md](AGENTS.md) for repository rules, then [HANDOFF.md](HANDOFF.md) 
 - Home Agents covers everyday tasks first, then cooking and inventory. Target languages: Tamil, Malayalam, Kannada, Hindi, English. WhatsApp voice is the intended primary interface; the executable website is the current product.
 - Python 3.12 hosted application; Flask/Gunicorn; vanilla HTML/CSS/JavaScript; SQLite visitor snapshots in private GCS; separate private Playwright browser worker.
 - The current application owns its bounded OpenRouter tool loop. Hermes plugins/MCP are prepared, but actual Hermes orchestration, Meta inference, hosted speech and WhatsApp are not connected.
+- Shared completion adapters and observed availability are implemented; see `docs/model-adapters.md`. A recent model response is not proof of task success. MODEL-01 remains provider-capacity blocked as of 27 October; do not recreate the completed adapter slice.
 - The human **skipped Nous setup/testing**. Do not request a Nous key again, provision it, or make it a required sprint dependency unless the human reopens that choice. Existing OpenRouter provider capacity remains a separately recorded limitation.
 - Public browser reads and checkout drafts are real implemented capabilities. Bills/journey booking simulations do not execute real transactions. Clinic appointments remain planned.
 

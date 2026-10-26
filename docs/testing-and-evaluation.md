@@ -2,7 +2,7 @@
 
 ## Baseline and interpretation
 
-The implementation checkpoint has 80 unit/API tests and JavaScript syntax/compile checks. CI uses synthetic/mocked external services and no production secrets. Actual public-browser and railway checks are separately recorded. Last real OpenRouter inference returned 429. An offline phrase score, a language dropdown, a handler mock or a declared model capability cannot establish live voice/agent task success.
+The implementation checkpoint has 97 unit/API tests (80 prior plus 17 adapter/health/workflow cases) and JavaScript syntax/compile checks. CI uses synthetic/mocked external services and no production secrets. Actual public-browser and railway checks are separately recorded. Last real OpenRouter inference returned 429. An offline phrase score, a language dropdown, a handler mock or a declared model capability cannot establish live voice/agent task success.
 
 ```text
 python -m pip install -r requirements-hosted.txt
@@ -19,6 +19,7 @@ Use fixtures/clean process environment for the suite. Do not load production key
 | --- | --- | --- |
 | Domain workflows | `test_workflows.py`, `test_checkout_handoff.py` | Repeat approval/meal/import/correction, stock conservation, role limits, no draft execution |
 | Hosted boundary/state | `test_hosted.py`, `test_cloud_state.py` | Cookie/origin/isolation, CAS conflicts, persistence, malformed requests |
+| Shared model adapters / request observations | `test_model_adapters.py`, `test_model_adapter_workflows.py`, `test_model_health.py`, `test_hosted_model_health.py` | Provider contract equivalence, replay/recovery, sanitized failures, stale/bounded observations and no inference probes on state reads |
 | Model/catalogue | `test_agent_loop.py`, `test_model_catalog.py` | Tool observations, bounds, permitted zero-price choices, forbidden actions, provider errors |
 | Public research | `test_browser_research.py`, `test_browser_hosted.py` | Versions, duplicates, cancellation, retained pages, matching quotes, blocked evidence, six-step budget |
 | Worker/policy | `test_browser_policy.py`, `test_browser_worker.py` | Private/credential URL rejection, pinned outbound IP, prohibited code/actions |

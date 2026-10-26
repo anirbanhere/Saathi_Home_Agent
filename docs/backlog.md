@@ -20,7 +20,7 @@ Deliver indexed current-state/product/architecture/API/data/security/operations 
 
 ### MODEL-01 — Establish one actual permitted free-model tool journey
 
-**P0 · S · Ready; live success depends on provider capacity · Depends:** existing model catalogue.
+**P0 · S · Live acceptance blocked by provider capacity (27 October) · Depends:** existing model catalogue. A fresh synthetic hosted inventory request returned HTTP429/RATE_LIMITED; the permitted catalogue still contained only Gemma4 26B. Diagnostic acceptance is recorded; successful live inference is not claimed.
 
 Use a fresh synthetic workspace through hosted message/research boundaries. Record key-permitted model, actual inventory tool observation and grounded reply; attempt source-backed research separately. Relevant: `agent_loop.py`, `model_catalog.py`, `research.py`, corresponding tests.
 
@@ -28,7 +28,7 @@ Use a fresh synthetic workspace through hosted message/research boundaries. Reco
 
 ### MODEL-02 — Introduce a provider-neutral planning seam
 
-**P1 · M · Depends:** `MODEL-01` diagnostics; [model contract](model-and-hermes-plan.md).
+**P1 · M · Implemented contract slice (27 October) · Depends:** `MODEL-01` diagnostics; [model contract](model-and-hermes-plan.md). See [adapter implementation](model-adapters.md). OpenRouter and local Meta share typed completion contracts; Meta evidence is synthetic, not live access.
 
 Wrap existing application/OpenRouter and local Meta planning behavior behind normalized inputs/results/errors. Keep domain policy and task identity outside provider SDKs. New module names are implementation choices; preserve existing HTTP behavior while adapting.
 
@@ -36,7 +36,7 @@ Wrap existing application/OpenRouter and local Meta planning behavior behind nor
 
 ### MODEL-03 — Make provider limits and recovery observable
 
-**P1 · S · Depends:** `MODEL-02` or a small compatible first slice.
+**P1 · S · Implemented request-observation slice (27 October) · Depends:** `MODEL-02`. Sanitized request failures and process-local per-model observations are exposed in Connections; durable metrics/budgets and provider-specific backoff remain separate future work.
 
 Expose structured capacity/auth/catalogue/timeout diagnostics and bounded retry guidance. Record model/request/phase latency without prompts or keys; preserve saved tool results on follow-up failure. Files: `integrations.py`, `agent_loop.py`, `research.py`, `web/app.js`.
 

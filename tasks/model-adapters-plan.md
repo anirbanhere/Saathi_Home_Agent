@@ -14,3 +14,5 @@ MODEL-01 was retried once through a fresh synthetic hosted workspace: the key-pe
 ## Verification
 
 Failing contract/availability tests first; then existing unit/API suite, syntax checks, actual browser UI and one bounded synthetic deployed request. Verify malformed/provider errors, credentials/endpoints, stale availability, no prompt/key retention, replay safety and Meta mock status. Keep real Meta/Hermes/voice claims unverified. Deploy only after tests, review, separate upload-manifest/credential-scan verification, then record revisions and GitHub CI.
+
+Checkpoint: implemented completion seam and process-local request observations; 97 tests pass. Actual initial rollout showed the real429 in Connections/banner, preserved direct recipe plans and public page inspection, and made no inference calls on status refresh. Final numeric-metadata regression fix and release/CI evidence are recorded in HANDOFF.md. No actual Meta/Hermes connection or successful live free-model task is claimed.

@@ -29,6 +29,7 @@ The human's instructions take priority over these project conventions. Documents
 | --- | --- |
 | Deterministic tools and transaction rules | `home_agent/service.py`, `store.py`, `contracts.py` |
 | Free-model reasoning and observations | `home_agent/agent_loop.py` |
+| Shared provider completion contract / request observations | `home_agent/model_adapters.py`, `model_health.py`, `docs/model-adapters.md` |
 | Key-permitted free model discovery | `home_agent/model_catalog.py` |
 | Railway provider, cache and freshness | `home_agent/trains.py` |
 | Isolated public browser / network policy | `browser_worker.py`, `browser_proxy.py`, `browser_policy.py`, `browser_client.py` |

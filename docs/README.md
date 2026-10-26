@@ -11,6 +11,7 @@ Maintained baseline: 26 October 2026, Asia/Kolkata. This documentation pack prep
 | Understand the product | [Product requirements](product-requirements.md) |
 | Understand deployed and target systems | [Architecture](architecture.md), [data/task design](data-and-task-design.md) |
 | Integrate with existing code | [HTTP/tool reference](api-reference.md), [model/Hermes plan](model-and-hermes-plan.md) |
+| Inspect the implemented model seam | [Shared completion adapters and observed availability](model-adapters.md) |
 | Build voice/channel capability | [Voice and WhatsApp plan](voice-and-whatsapp-plan.md) |
 | Choose the next work | [Roadmap](roadmap.md), [sprint plan](sprint-plan.md), [implementable backlog](backlog.md) |
 | Run and change the app | [Development and Claude workflow](development-and-claude.md) |

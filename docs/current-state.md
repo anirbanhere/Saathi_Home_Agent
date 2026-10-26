@@ -1,6 +1,6 @@
 # Current state and evidence
 
-Baseline inspected: source commit `6f4eb4a`, 26 October 2026. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.
+Baseline inspected: source commit `f72913f`, 27 October 2026; earlier release evidence is preserved below. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.
 
 ## Running editions
 
@@ -17,6 +17,7 @@ Public app: [Home Agents](https://home-agents-xswei7prnq-uc.a.run.app/). Source:
 | Capability | Actual status | Evidence/source | Remaining boundary |
 | --- | --- | --- | --- |
 | Free OpenRouter planning | Implemented/deployed | `agent_loop.py`, `test_agent_loop.py` | Last real inference attempts returned 429; no successful full live model/tool journey claimed |
+| Shared completion adapters / observed availability | Implemented/deployed | `model_adapters.py`, `model_health.py`, [adapter notes](model-adapters.md) | Meta uses contract tests only; request availability is process-local and not task success |
 | Key-permitted model selector | Implemented/deployed | `model_catalog.py`, `test_model_catalog.py` | Catalogue permission is not provider availability; last permitted choice was Gemma 4 26B free |
 | Public page inspection | Live verified | `browser_worker.py`, public website→worker checks | Public HTTPS/read profile; some sites deny access |
 | Research progress/resume/cancel | Implemented/deployed | `research.py`, research/hosted tests | Browser client drives requests; no unattended background progress |
@@ -37,11 +38,11 @@ Public app: [Home Agents](https://home-agents-xswei7prnq-uc.a.run.app/). Source:
 
 ## Release evidence
 
-- Website revision `home-agents-00007-r6f`, image build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`.
-- Previous verified website revision `home-agents-00006-x47` is the recorded rollback target.
+- Website revision `home-agents-00009-xhz`, image build `3c7a6caf-5c61-4ee5-ae81-421b412816d6`.
+- Previous verified website revision `home-agents-00008-hq7` is the recorded rollback target.
 - Private browser revision `home-agents-browser-00001-w2m`, image build `0604bf8b-5c08-4f48-84d5-a2b4d8f5f07f`.
-- Existing implementation baseline: 80 Python unit/API tests; JavaScript syntax; dependency audit reported no known vulnerabilities at that checkpoint. This is dated evidence, not a permanent vulnerability guarantee.
-- [Implementation CI passed](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40358466068) for `4644463f9a5648b7a59727a8e877f4a239690069`.
+- Current implementation baseline: 97 Python unit/API tests (80 previous plus 17 adapter/health/workflow cases); JavaScript syntax; the prior 26 October dependency audit reported no known vulnerabilities and dependencies were unchanged in this release. This is dated evidence, not a permanent vulnerability guarantee.
+- [Adapter release CI passed](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40396119648) for `f72913f19b5dbfdc113e4487b796c37a2fc681c7` (97 tests). Earlier hybrid CI remains in the historical deployment record.
 - Actual worker read Python.org and filled/submitted its search. Public app persisted evidence and handled duplicate step requests. Private worker rejected unauthenticated access 403.
 - Actual IndiGo page returned403 and `needs_input`; no live flight result was established. OpenRouter 429 preserved inspected source evidence.
 

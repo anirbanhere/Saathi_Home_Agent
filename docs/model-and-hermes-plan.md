@@ -2,13 +2,15 @@
 
 ## Present implementation
 
+27 October update: the existing OpenRouter and local Meta paths now use a shared typed completion contract, with process-local request observations displayed separately from catalogue permission. See [implemented adapters and status](model-adapters.md). Actual free inference still returned429 in the fresh production check; Meta is contract-tested only.
+
 `FreeModelAgent` calls OpenRouter's chat-completions interface with validated function schemas. It accepts free routes only and is further gated by the authenticated model catalogue: zero input/output price, `:free` identifier, tools/tool_choice support and key permissions. Last live tests permitted only Gemma 4 26B and received429; catalogue inclusion is not evidence of working inference.
 
 The local `MusePlanner` is a separate adapter, not a connected hosted Meta model. The stdio MCP household server and `integrations/hermes-public-browser/` plugin are prepared and tested at protocol/handler level. None proves an actual Hermes session. Do not describe the existing loop as Hermes.
 
 Nous's eight candidate free models were catalogued, but the human then chose **skip**. Do not add a Nous key request, account signup, paid access, x402 transaction or required migration to this plan. Reconsider only if explicitly reopened.
 
-## Proposed provider-neutral interface
+## Proposed higher-level task/runtime interface
 
 Keep the deterministic domain/tool policy independent of SDK/runtime. Introduce a narrow adapter seam around existing planning code rather than a wholesale framework rewrite.
 
@@ -26,7 +28,7 @@ AgentOutput:
   provider/model identity, usage, latency, normalized failure
 ```
 
-These are proposed internal types, not current exported classes. The application injects principal/task context. Model output cannot choose account identity, approvals or arbitrary endpoints. Credentials come from the provider-specific server configuration and must never be sent to another provider's endpoint. Endpoint profiles should be fixed/validated; replacing a model ID is not enough to switch providers safely.
+These larger task/runtime types remain proposed. The implemented narrower completion types are documented in model-adapters.md; they do not implement all fields above. The application injects principal/task context. Model output cannot choose account identity, approvals or arbitrary endpoints. Credentials come from provider-specific server configuration and must never be sent to another provider's endpoint. Replacing a model ID alone is not enough to switch providers safely.
 
 Provider selection must be a user/operator policy choice. A failure may allow switching to another permitted free choice, but not paid fallback or guardrail relaxation. Maintain task identity, observations, approved payload and operation state across changes. Do not replay already committed actions when retrying reasoning. A larger context window or declared tool support is not a substitute for measured task success.
 

@@ -17,7 +17,7 @@ Start with [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDO
 | Capability | Current state |
 | --- | --- |
 | Public website | Flask/Gunicorn on Cloud Run, separate anonymous visitor workspaces saved in private GCS |
-| Free-model planning | Bounded OpenRouter tool loop and key-permitted free-model selector; last real inference attempts returned 429 |
+| Free-model planning | Shared completion contract and bounded OpenRouter tools; Connections shows actual recent request status separately from key access. Latest real attempt returned 429 |
 | Public web research | Real isolated Chromium inspection, sources/timestamps, persisted progress/resume/cancel; AI reasoning remains provider-capacity dependent |
 | Train status | Direct RailRadar report lookup, independent of the LLM, with source/update/freshness labels |
 | Kitchen | Reviewed grocery CSV import, normalized units, corrections, event history and repeat-safe estimated meal consumption |
@@ -67,7 +67,7 @@ node --check web/app.js
 python -m compileall -q home_agent
 ```
 
-The implementation checkpoint has 80 unit/API tests and separate dated live browser/railway evidence. `python -m evals.run` is an optional 40-case offline phrase evaluation that regenerates a documentation report; it is not a speech benchmark. GitHub Actions runs the existing suite without production credentials. See [evaluation strategy](docs/testing-and-evaluation.md).
+The current implementation checkpoint has 97 unit/API tests and separate dated live browser/railway evidence. `python -m evals.run` is an optional 40-case offline phrase evaluation that regenerates a documentation report; it is not a speech benchmark. GitHub Actions runs the existing suite without production credentials. See [evaluation strategy](docs/testing-and-evaluation.md).
 
 ## Project map
 

@@ -11,14 +11,16 @@ Read CLAUDE.md, AGENTS.md and HANDOFF.md first, then docs/current-state.md
 and docs/README.md. Preserve unrelated working-tree changes. Use source/tests
 as the authority for implemented behavior, and mark proposals separately.
 
-Start with backlog ticket MODEL-01: establish one actual permitted free-model
-tool journey using fresh synthetic state. Inspect the existing catalogue,
-agent loop and tests before changing anything. Do not require a new provider,
-paid inference or weakened guardrails. Nous setup/testing was explicitly skipped.
+Choose the next ready ticket from the latest HANDOFF.md. As of 27 October,
+MODEL-01 was checked and remains capacity-blocked; MODEL-02's shared completion
+seam and MODEL-03's request observations are implemented. Prefer an independent
+QA-02 or bounded VOICE-01 slice rather than repeat the same blocked request.
+Inspect existing source/tests first. Do not require a new provider, paid
+inference or weakened guardrails. Nous setup/testing was explicitly skipped.
 
-If provider capacity prevents actual inference, record the exact redacted
-blocker and stop bounded retries. Continue an independent ready slice from
-QA-01 or a narrow MODEL-02 adapter-contract task; do not fabricate live evidence.
+If a selected integration is externally blocked, record its exact redacted
+blocker and continue an independent ready slice. Do not recreate already
+implemented adapters, poll unavailable providers or fabricate live evidence.
 
 Before implementation, state the selected acceptance path and relevant files.
 Implement one coherent slice, run appropriate existing/new checks, review
@@ -37,7 +39,7 @@ of commits and output. Follow docs/development-and-claude.md and the runbook
 for any later authorized runtime rollout.
 ```
 
-This prompt is a suggested new engineering task, not proof that MODEL-01 was completed or authorization for unrelated external effects. Edit the selected ticket if your next priority changes.
+This prompt selects work from the latest checkpoint, not proof that live MODEL-01 acceptance succeeded or authorization for unrelated external effects. Edit the selected ticket if your next priority changes.
 
 ## Context bundles by task
 

@@ -24,6 +24,8 @@ Maximum hosted JSON body:32,000 bytes. Responses are private/no-store. Cross-ori
 
 No separate hosted `GET /api/tasks/<id>` is implemented; retrieve tasks through `/api/state`. No hosted `/api/speech/*` routes are implemented. Do not derive route availability merely from frontend controls or local adapter code.
 
+27 October addition: state includes `integrations.model_health` for currently permitted model IDs. It records the most recent completion outcome/code/time/duration seen by this application process, becomes stale after five minutes and resets on restart. GET state/Refresh connection status does not initiate inference. A `responding` request observation is not verified task success. See [model adapters](model-adapters.md).
+
 ## Core task/result shape
 
 ```json
