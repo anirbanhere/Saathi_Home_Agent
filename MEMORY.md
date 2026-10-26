@@ -10,7 +10,7 @@ Last updated: 26 October 2026, Asia/Kolkata.
 - GCP project: `sathi-home-agent`, number `59012364414`; selected region: `us-central1`. Billing is linked. The user reported INR 15,000 resources, but exact remaining credit/expiry/quotas have not been verified.
 - Website access: public link sharing is authorized. Browser workspaces remain separate until real household identity/sharing is implemented.
 - Current website placement: Cloud Run plus private Cloud Storage visitor snapshots. ADR-002 supersedes the VM recommendation for the immediate website; a continuous WhatsApp worker may need a different placement later.
-- GitHub repository: `https://github.com/anirbanbiswas91/home-agents`; private by default. The user requested agent context/handoff/skills files and AI-assisted maintenance.
+- Canonical GitHub repository: `https://github.com/anirbanhere/Saathi_Home_Agent`, explicitly selected by the user; its existing visibility is public. The earlier `anirbanbiswas91/home-agents` repository is historical. The user requested agent context/handoff/skills files and AI-assisted maintenance. Keep the original repository intact unless asked to remove it.
 - The Sites edition is an earlier browser-local offline demo; the GCP backend is a separate deployment.
 - WhatsApp route/eligibility, open-weight speech deployment, live train/booking/payment providers, and actual Hermes integration remain unverified or unconnected unless newer handoff evidence says otherwise.
 

@@ -43,7 +43,7 @@ Use small, testable changes. Add tests for ownership, duplicates, error recovery
 - Use Secret Manager for production keys and service identities with resource-scoped roles. Do not replace a rejected permission with a broader role.
 - Check `gcloud meta list-files-for-upload` before a source build. `.gcloudignore` intentionally uses an allowlist.
 - Public website deployment is authorized in `sathi-home-agent`, `us-central1`; new unrelated paid resources, public repository visibility, real-world transactions, and new third-party messages require human authorization.
-- Keep the GitHub repository private unless the human requests otherwise. Branch names use `codex/`. Preserve unrelated changes; never reset the working tree to clear uncertainty.
+- Canonical repository: `https://github.com/anirbanhere/Saathi_Home_Agent`, explicitly selected by the human. It is public; preserve its visibility unless asked to change it. Branch names use `codex/`. Preserve unrelated changes; never reset the working tree to clear uncertainty.
 - Do not add unattended cloud deployment from untrusted PRs. CI uses read-only repository permissions and no production secrets.
 
 ## Context and handoff discipline

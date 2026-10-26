@@ -1,5 +1,7 @@
 # Home Agent
 
+Source repository: [anirbanhere/Saathi_Home_Agent](https://github.com/anirbanhere/Saathi_Home_Agent).
+
 Current product design: [WhatsApp voice and interchangeable models on GCP](docs/home-agents-redesign.md), with an [ordered delivery plan](tasks/voice-first-plan.md). These describe the next architecture; the runnable prototype below retains its current behavior.
 
 Public website: **https://home-agents-xswei7prnq-uc.a.run.app**. Deployment project: [`sathi-home-agent` in `us-central1`](docs/gcp-setup.md). See the deployment record for actual tool checks and current free-provider availability.

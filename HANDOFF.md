@@ -4,7 +4,7 @@ Updated: 26 October 2026, Asia/Kolkata. Active branch: `codex/home-agent-demo`.
 
 ## Immediate objective
 
-Deploy a public website in GCP using live free models to execute the available tools, and push a maintainable private GitHub repository with agent context files. Keep this ahead of additional architecture planning or WhatsApp/hardware expansion.
+Maintain the deployed public GCP website and finish live free-model tool verification. The user selected `https://github.com/anirbanhere/Saathi_Home_Agent` as the canonical source repository, preserving its public visibility. Sync the app and agent context files there after authenticating with write access.
 
 ## Completed locally
 
@@ -14,7 +14,8 @@ Deploy a public website in GCP using live free models to execute the available t
 - Browser includes free-model selection and visible agent action evidence. Original fixtures/sandbox labels remain.
 - 48 Python tests passed, including hosted isolation, restart persistence, repeat-safe approvals, snapshot conflicts, rejected cross-origin requests and model boundaries. JavaScript syntax/markup checks passed. Hosted dependency audit found no known vulnerabilities.
 - Public HTTPS tools were verified with a fresh sample workspace: recipe plan, meal completion, saved inventory, duplicate sandbox approval, and separate visitor isolation. Browser loaded the real hosted state and model controls; successful live inference remains unverified.
-- Created and pushed private GitHub repository `anirbanbiswas91/home-agents`; `main` is the default branch. CI passed for `fa0b72387a110ac84c0acdab4f3c06cb233d517e` (run `40334299072`). Agent context, domain skills and workflow are included.
+- Previously created and pushed private GitHub repository `anirbanbiswas91/home-agents`; `main` is its default branch. CI passed for `fa0b72387a110ac84c0acdab4f3c06cb233d517e` (run `40334299072`). Agent context, domain skills and workflow are included. This is historical evidence, not the currently selected repository.
+- Selected replacement `anirbanhere/Saathi_Home_Agent` was verified empty and public. GitHub CLI is now authenticated as `anirbanhere`, with ADMIN access. `origin` points to the selected repository; `previous-origin` preserves the earlier repository. Public-push source/history credential scans passed. Initial sync and new-repository CI are the remaining migration checks.
 
 ## Cloud progress
 
@@ -37,6 +38,7 @@ The OpenRouter key is valid. Its filtered catalog initially allowed only `google
 
 ## Next actions
 
+0. Push `main` to the selected `origin`, verify its files/default branch and CI, then record the completed migration. Authentication, remote switching, and source/history credential scans are already complete. Preserve the old repository.
 1. Await confirmation that additional free models were allowed; the latest filtered-catalog check still returned Gemma 4 26B only. The final public synthetic inference request also returned HTTP 429.
 2. When available, select an allowed alternative through Connections (or update `deploy/gcp/env.yaml` and the service default), then complete a synthetic-only live tool loop. This is the remaining inference acceptance condition, not a reason to claim a mock is live.
 3. Update this handoff and deployment evidence after that real inference check. The website/tools/GitHub work is already deployed and verified; do not restart infrastructure setup.
