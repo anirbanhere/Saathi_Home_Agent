@@ -45,6 +45,7 @@ For a rebuild, first verify tests, `gcloud meta list-files-for-upload` and a cre
 ## Verification and remaining limits
 
 - Browser dependency audit found no known vulnerabilities. Actual 500px viewport had no horizontal overflow.
+- Implementation [GitHub CI passed](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40358466068) for `4644463f9a5648b7a59727a8e877f4a239690069`. Final public health returned `ok`; the ready website revision was verified after rollout.
 - 80 unit/API tests passed, including private-URL/DNS checks, pinned proxy connections, unsupported code/actions, ownership, repeated steps, model outage, source quotes, draft non-execution and plugin registration.
 - Actual private worker read the Python homepage and filled/submitted its public search form to the results page. Unauthenticated worker access returned 403.
 - A fresh public visitor invoked the private worker through the website, saved page evidence, repeated the same step safely, and retrieved persisted history. Actual website form interaction completed and displayed the source. No browser console errors/warnings were present.
