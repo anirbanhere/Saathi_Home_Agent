@@ -64,6 +64,8 @@ const taskNames = {
   recipe_plan: "Cooking plan",
   dish_suggestions: "Dinner ideas",
   inventory_list: "Kitchen stock",
+  web_research: "Public web research",
+  checkout_handoff: "Checkout handoff draft",
 };
 const statusNames = {
   awaiting_approval: "Needs approval",
@@ -262,7 +264,7 @@ function taskCard(task, compact = false) {
     el(
       "span",
       "task-badge " + task.status,
-      statusNames[task.status] || task.status,
+      task.kind === "web_research" && task.status === "planned" ? "Ready to inspect" : statusNames[task.status] || task.status,
     ),
   );
   card.append(head);
@@ -280,10 +282,41 @@ function taskCard(task, compact = false) {
           live: "RECENT PROVIDER REPORT · Check update time",
           stale: "STALE PROVIDER REPORT · Check again for current status",
           reported: "PROVIDER REPORT · Freshness or position unverified",
+          public_browser: "PUBLIC PAGE EVIDENCE · Check source and time",
+          draft: "DRAFT ONLY · Verify with the provider",
         }[result.mode] || result.mode,
       ),
     );
   if (compact) card.append(el("p", "task-summary", result.summary));
+  if (!compact && task.kind === "checkout_handoff") {
+    card.append(el("p", "task-summary", result.summary), el("p", "", result.details));
+    const review = el("ol");
+    for (const item of result.required_review || []) review.append(el("li", "", item));
+    const link = el("a", "button secondary", "Open provider to continue ↗");
+    link.href = result.destination;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    card.append(review, link);
+  }
+  if (!compact && task.kind === "web_research") {
+    card.append(el("p", "small-muted", task.args.goal));
+    card.append(el("p", "task-summary", result.summary));
+    for (const page of result.pages || []) {
+      const source = el("details", "task-detail");
+      source.append(el("summary", "", page.title || page.url));
+      const link = el("a", "", page.url);
+      link.href = page.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      source.append(link, el("p", "small-muted", `Inspected: ${page.observed_at} · ${page.state}`), el("pre", "", page.text));
+      card.append(source);
+    }
+    if (result.citation) card.append(el("blockquote", "", result.citation.quote));
+    if (result.notice) card.append(el("p", "small-muted", result.notice));
+    const progress = el("ol", "small-muted");
+    for (const step of result.trace || []) progress.append(el("li", "", `${step.action} · ${step.code || step.url || step.at}`));
+    card.append(progress);
+  }
   if (!compact && task.kind === "train_status") {
     card.append(el("p", "task-summary", result.summary));
     if (result.mode !== "fixture" && result.source) {
@@ -346,12 +379,28 @@ function taskCard(task, compact = false) {
     cancel.dataset.task = task.id;
     actions.append(approve, cancel);
   }
-  if (task.status === "planned") {
+  if (task.status === "planned" && task.kind === "recipe_plan") {
     const cooked = el("button", "button primary", "Mark cooked · update stock");
     cooked.type = "button";
     cooked.dataset.action = "complete";
     cooked.dataset.task = task.id;
     actions.append(cooked);
+  }
+  if (task.kind === "web_research" && ["planned", "running", "needs_input"].includes(task.status)) {
+    for (const [name, label] of [["research", "Continue research"], ["cancel", "Cancel"]]) {
+      const button = el("button", "button secondary", label);
+      button.type = "button";
+      button.dataset.action = name;
+      button.dataset.task = task.id;
+      actions.append(button);
+    }
+  }
+  if (task.kind === "checkout_handoff" && task.status === "needs_input") {
+    const cancel = el("button", "button secondary", "Discard draft");
+    cancel.type = "button";
+    cancel.dataset.action = "cancel";
+    cancel.dataset.task = task.id;
+    actions.append(cancel);
   }
   if (actions.childElementCount) card.append(actions);
   if (!compact) {
@@ -479,6 +528,7 @@ function renderConnections() {
   const list = $("#connections-list");
   list.replaceChildren();
   const rows = [
+    ["Public browser", "Reads public websites in an isolated Chromium worker. Account logins and transactions require handoff.", data.browser?.configured ? "Connected · public pages" : "Not connected", data.browser?.configured],
     [
       "Free AI · OpenRouter",
       "Live reasoning, tool calls and tool observations. Only free models are allowed; availability and quotas vary.",
@@ -584,6 +634,9 @@ function renderConnections() {
   $("#speech-note").textContent = data.asr
     ? "Indic endpoint configured"
     : "Speech service not connected";
+  $("#research-note").textContent = data.browser?.configured
+    ? "Public browser connected. Login, payment, ordering and CAPTCHA steps require human handoff. Closing this tab pauses further steps; resume in task history. AI research uses the free model selected in Connections."
+    : "Public browser is not connected in this environment. Configure the private worker to enable research.";
   $("#mode-title").textContent = $("#engine").value === "openrouter" ? (models.length ? "Free AI configured" : "Free AI needs model access") :
     $("#engine").value === "muse" ? "Muse selected" : "Offline demo";
   const trainLabel = data.train?.provider === "railradar" ? (data.train.configured ? "RailRadar train reports" : "Railway API key needed") : "Sample train data";
@@ -600,7 +653,7 @@ async function sendMessage(value) {
   $("#send-message").disabled = true;
   $("#conversation-mode").textContent = "Working on your request…";
   try {
-    await api("/api/messages", {
+    const response = await api("/api/messages", {
       text: value,
       language: $("#language").value,
       session: state.session,
@@ -610,6 +663,7 @@ async function sendMessage(value) {
     });
     $("#message").value = "";
     await refresh();
+    if (response.task?.kind === "web_research") await continueResearch(response.task);
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -666,7 +720,9 @@ document.addEventListener("click", async (event) => {
   const action = event.target.closest("[data-action]");
   if (!action) return;
   const task = state.data.tasks.find((task) => task.id === action.dataset.task);
-  if (action.dataset.action === "review") {
+  if (action.dataset.action === "research") {
+    await run(() => continueResearch(task), action);
+  } else if (action.dataset.action === "review") {
     state.approval = task.id;
     const r = task.result;
     $("#approval-description").textContent =
@@ -812,6 +868,45 @@ $("#train-form").addEventListener("submit", (event) => {
       $("#train-results").replaceChildren(el("p", "inline-notice", error.message));
       throw error;
     }
+  }, event.submitter);
+});
+const researchInFlight = new Set();
+async function continueResearch(task) {
+  if (researchInFlight.has(task.id)) return;
+  researchInFlight.add(task.id);
+  try {
+    do {
+      $("#research-results").replaceChildren(el("p", "small-muted", `Working… step ${task.args.version + 1} of 6. Sources will appear below.`));
+      const model = $("#model-select").value;
+      task = await api(`/api/browser/tasks/${task.id}/steps`, {version: task.args.version, ...(model ? {model} : {})});
+      await refresh();
+      $("#research-results").replaceChildren(taskCard(task));
+    } while (task.status === "running" && !document.hidden);
+  } finally {
+    researchInFlight.delete(task.id);
+  }
+}
+$("#research-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  run(async () => {
+    const task = await api("/api/browser/tasks", {
+      goal: $("#research-goal").value.trim(), url: $("#research-url").value.trim(),
+      mode: $("#research-mode").value, model: $("#model-select").value,
+      session: state.session, request_id: crypto.randomUUID(),
+    });
+    await refresh();
+    await continueResearch(task);
+  }, event.submitter);
+});
+$("#handoff-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  run(async () => {
+    const task = await api("/api/tools", {name: "checkout_handoff", arguments: {
+      kind: $("#handoff-kind").value, merchant_url: $("#handoff-url").value.trim(),
+      details: $("#handoff-details").value.trim(), language: $("#language").value,
+    }});
+    await refresh();
+    $("#handoff-results").replaceChildren(taskCard(task));
   }, event.submitter);
 });
 $("#audio-file").addEventListener("change", (event) =>

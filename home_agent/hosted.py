@@ -16,6 +16,8 @@ from .errors import AppError, text
 from .server import STATIC
 from .model_catalog import ModelCatalog
 from .trains import configuration as train_configuration
+from .browser_client import BrowserClient
+from .research import ResearchTasks
 
 COOKIE = "__Host-home-agent"
 DEFAULT_MODEL = "google/gemma-4-26b-a4b-it:free"
@@ -37,7 +39,7 @@ class Limits:
             events.append(stamp)
 
 
-def create_app(repository=None, model_catalog=None):
+def create_app(repository=None, model_catalog=None, browser=None):
     app = Flask(__name__, static_folder=None)
     app.config["MAX_CONTENT_LENGTH"] = 32_000
     repository = repository or VisitorState()
@@ -47,6 +49,22 @@ def create_app(repository=None, model_catalog=None):
     def model_budget():
         limits.consume("model-minute", 15, 60)
         limits.consume("model-day", 45, 86400)
+
+    def browser_budget():
+        limits.consume("browser-minute", 6, 60)
+        limits.consume("browser-day", 100, 86400)
+
+    browser = browser or BrowserClient(before_request=browser_budget)
+    research = ResearchTasks(browser)
+
+    def authorize_model(model):
+        free_model(model)
+        catalog = model_catalog.status(os.environ.get("OPENROUTER_API_KEY", ""))
+        if not catalog["verified"] or not catalog["models"]:
+            raise AppError(catalog["message"], 503, catalog["code"])
+        if model not in catalog["models"]:
+            raise AppError("Select a free model permitted by your OpenRouter key in Connections.", 403, "MODEL_NOT_ALLOWED")
+        return model
 
     @app.before_request
     def boundary():
@@ -109,6 +127,7 @@ def create_app(repository=None, model_catalog=None):
             "asr": False, "tts": False, "hermes": "Not connected; bounded application tool loop active",
             "whatsapp": "Not connected", "travel": "Live provider adapter" if train_configuration()["configured"] else "Train provider not connected" if train_configuration()["provider"] == "railradar" else "Sample data", "payments": "Sandbox",
             "train": train_configuration(),
+            "browser": {"configured": browser.configured, "profile": "public_readonly", "accounts": False},
             "storage": "Private Cloud Storage snapshots" if repository.bucket_name else "Local visitor storage",
         }
         return jsonify(result)
@@ -138,11 +157,22 @@ def create_app(repository=None, model_catalog=None):
                     model = data.get("model") or (preferred if preferred in catalog["models"] else catalog["models"][0])
                     if model not in catalog["models"]:
                         raise AppError("This model is not permitted by the configured API key. Refresh Connections and select an allowed free model. To enable it, update the key's OpenRouter guardrails.", 403, "MODEL_NOT_ALLOWED")
-                    result = FreeModelAgent(model=model, before_request=model_budget).message(agent, content, language, session, request_id)
+                    result = FreeModelAgent(model=model, before_request=model_budget, research=research).message(agent, content, language, session, request_id)
                 elif engine == "offline":
                     result = agent.message(content, language, session, request_id)
                 else:
                     raise AppError("Choose the free AI or offline engine.")
+            elif route == "browser/tasks":
+                if set(data) - {"goal", "url", "mode", "model", "session", "request_id"}:
+                    raise AppError("Unsupported browser-task fields.")
+                result = research.start(agent, **data)
+            elif (match := re.fullmatch(r"browser/tasks/([a-f0-9]{32})/steps", route)):
+                if set(data) - {"version", "model"}:
+                    raise AppError("Provide a task version and optional permitted model.")
+                result = research.advance(agent, match[1], data.get("version"),
+                                          key=os.environ.get("OPENROUTER_API_KEY", ""),
+                                          model=data.get("model"), before_request=model_budget,
+                                          authorize_model=authorize_model)
             elif route == "tools":
                 result = agent.tool(text(data.get("name"), "tool name", 40), data.get("arguments", {}))
             elif route == "receipts":

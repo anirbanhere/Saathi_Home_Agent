@@ -55,6 +55,18 @@ class AgentLoopTests(unittest.TestCase):
         with self.assertRaises(AppError):
             FreeModelAgent(key="test", model="provider/paid-model")
 
+    def test_browser_request_queues_saved_task_without_claiming_research_complete(self):
+        from home_agent.research import ResearchTasks
+        agent = FreeModelAgent(key="synthetic", model="openrouter/free", research=ResearchTasks())
+        with patch("home_agent.agent_loop.post_json", return_value=call("start_web_research", {"goal": "Check flight ZX123", "url": "https://example.com"})) as provider:
+            result = agent.message(self.app, "Check flight ZX123", "en", "chat", "web")
+            again = agent.message(self.app, "Check flight ZX123", "en", "chat", "web")
+        self.assertEqual(result, again)
+        self.assertEqual(provider.call_count, 1)
+        self.assertEqual(result["task"]["kind"], "web_research")
+        self.assertEqual(result["task"]["status"], "planned")
+        self.assertEqual(result["task"]["result"]["pages"], [])
+
     def test_request_id_conflict_and_missing_key(self):
         with patch("home_agent.agent_loop.post_json", return_value=reply("Which dish?")):
             self.agent.message(self.app, "Cook", "en", "chat", "same-id")

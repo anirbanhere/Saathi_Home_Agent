@@ -12,6 +12,11 @@ from .languages import LANGUAGES
 from .service import TOOL_ARGS
 from .store import now
 
+RESEARCH_START_SCHEMA = {"type": "function", "function": {
+    "name": "start_web_research",
+    "description": "Start a saved public-web research task for flights or other information beyond the existing tools. The website continues browser steps after this response. This only prepares research, never executes a transaction or answers from unseen pages.",
+    "parameters": {"type": "object", "properties": {"goal": {"type": "string", "maxLength": 2000}, "url": {"type": "string", "maxLength": 2000}}, "required": ["goal"], "additionalProperties": False}}}
+
 
 def free_model(model):
     if not isinstance(model, str) or not (model == "openrouter/free" or model.endswith(":free")):
@@ -22,12 +27,13 @@ def free_model(model):
 
 
 class FreeModelAgent:
-    def __init__(self, key=None, model=None, before_request=None):
+    def __init__(self, key=None, model=None, before_request=None, research=None):
         self.key = os.environ.get("OPENROUTER_API_KEY", "") if key is None else key
         if not self.key:
             raise AppError("The free AI connection is not configured yet.", 503, "NOT_CONFIGURED")
         self.model = free_model(model or os.environ.get("OPENROUTER_MODEL", "openrouter/free"))
         self.before_request = before_request or (lambda: None)
+        self.research = research
 
     def message(self, app, content, language, session, request_id=None):
         content = text(content, "message", 4000)
@@ -69,6 +75,11 @@ class FreeModelAgent:
         messages.append({"role": "user", "content": content})
         tools = [{"type": "function", "function": {"name": t["name"], "description": t["description"],
                   "parameters": t["inputSchema"]}} for t in tool_schemas()]
+        allowed_args = dict(TOOL_ARGS)
+        if self.research:
+            tools.append(RESEARCH_START_SCHEMA)
+            allowed_args["start_web_research"] = {"goal", "url"}
+            messages[0]["content"] += " For public-web questions beyond the existing tools, start_web_research queues browser research. It does not already contain a researched answer."
         trace, task, answer, provider_model = [], None, "", self.model
         notice = "Live free-model inference. Train reports identify their provider, update time and freshness; payments and journey bookings are sandbox only."
         for iteration in range(3):
@@ -100,7 +111,7 @@ class FreeModelAgent:
                     identifier = text(call["id"], "tool call ID", 180)
                     name = call["function"]["name"]
                     args = json.loads(call["function"]["arguments"])
-                    if name not in TOOL_ARGS or not isinstance(args, dict) or set(args) - TOOL_ARGS[name]:
+                    if name not in allowed_args or not isinstance(args, dict) or set(args) - allowed_args[name]:
                         raise ValueError()
                     validated.append((identifier, name, args))
                 if len({v[0] for v in validated}) != len(validated):
@@ -110,14 +121,21 @@ class FreeModelAgent:
             messages.append({"role": "assistant", "content": message.get("content"), "tool_calls": calls})
             for identifier, name, args in validated:
                 try:
-                    with app.store.transaction() as db:
-                        task = app._tool(db, name, {**args, "language": language}, "owner", language, session)
+                    if name == "start_web_research":
+                        task = self.research.start(app, **args, model=self.model, session=session,
+                                                   request_id=request_id + ":research:" + str(len(trace)))
+                    else:
+                        with app.store.transaction() as db:
+                            task = app._tool(db, name, {**args, "language": language}, "owner", language, session)
                     observation = {"tool": name, "task_id": task["id"], "status": task["status"], "result": task["result"]}
                     trace.append({"tool": name, "task_id": task["id"], "status": task["status"]})
                 except AppError as error:
                     observation = {"tool": name, "error": {"code": error.code, "message": str(error)}}
                     trace.append({"tool": name, "status": "validation_error"})
                 messages.append({"role": "tool", "tool_call_id": identifier, "content": json.dumps(observation, ensure_ascii=False)})
+            if task and task["kind"] == "web_research":
+                answer = task["result"]["summary"]
+                break
 
         answer = answer or (task["result"]["summary"] if task else "Please clarify the request or try a supported task.")
         result = {"reply": answer, "language": language, "task": task, "trace": trace,

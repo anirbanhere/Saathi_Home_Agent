@@ -331,6 +331,25 @@ Carrot,250,g</textarea
 
         <section id="view-activity" class="view" aria-label="Activity">
           <section class="panel form-panel">
+            <span class="small-label">PUBLIC WEB RESEARCH</span>
+            <h2>Let the agent look it up.</h2>
+            <p>Inspect a public page directly, or ask your selected free AI model to research it. Sources and progress stay in your task history.</p>
+            <form id="research-form">
+              <label for="research-goal">What should we find?</label>
+              <textarea id="research-goal" maxlength="2000" required>Read this page and explain what it says.</textarea>
+              <label for="research-url">Public HTTPS page · optional for AI research</label>
+              <input id="research-url" type="url" placeholder="https://example.com" maxlength="2000" />
+              <label for="research-mode">How to work</label>
+              <select id="research-mode">
+                <option value="inspect">Inspect page · no AI needed</option>
+                <option value="agent">AI research · selected free model</option>
+              </select>
+              <button class="button primary" type="submit">Start research ↗</button>
+            </form>
+            <p id="research-note" class="field-hint">Public pages only. Login, payment, ordering and CAPTCHA steps require a human handoff. Closing this tab pauses further steps; resume from task history.</p>
+            <div id="research-results" aria-live="polite"></div>
+          </section>
+          <section class="panel form-panel">
             <span class="small-label">TRAIN RUNNING STATUS</span>
             <h2>Check a train.</h2>
             <p id="train-feed-note">Select the date the train departed its origin. Provider reports may lag the train's actual position.</p>
@@ -345,6 +364,21 @@ Carrot,250,g</textarea
             <div id="train-results" aria-live="polite"></div>
           </section>
           <div class="activity-layout">
+            <section class="panel form-panel">
+              <span class="small-label">BILLS &amp; FOOD ORDERS</span>
+              <h2>Prepare a handoff.</h2>
+              <p>Save what you need and finish in the provider's secure app. This demo prepares a draft; it does not pay or place orders.</p>
+              <form id="handoff-form">
+                <label for="handoff-kind">Task</label>
+                <select id="handoff-kind"><option value="food">Food order</option><option value="bill">Bill payment</option></select>
+                <label for="handoff-url">Provider's public homepage</label>
+                <input id="handoff-url" type="url" placeholder="https://your-provider.example" required maxlength="2000" />
+                <label for="handoff-details">Draft details · use demo data</label>
+                <textarea id="handoff-details" required maxlength="1000" placeholder="Two masala dosas, less spicy. Verify availability and total with the restaurant."></textarea>
+                <button class="button primary" type="submit">Save handoff draft ↗</button>
+              </form>
+              <div id="handoff-results" aria-live="polite"></div>
+            </section>
             <section class="panel form-panel">
               <span class="small-label">A JOURNEY, WITHOUT THE RUSH</span>
               <h2>Try a sandbox booking.</h2>

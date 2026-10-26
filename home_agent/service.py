@@ -13,6 +13,7 @@ from .errors import AppError, number, text
 from .languages import LANGUAGES, detect_language, say
 from .store import Store, now
 from .trains import DEFAULT_FEED, configuration as train_configuration
+from .browser_policy import public_url
 
 DEFAULT_DB = Path(__file__).resolve().parent.parent / "data" / "home-agent.sqlite3"
 HOUSEHOLD_TOOLS = {"inventory_list", "recipe_plan", "dish_suggestions"}
@@ -22,6 +23,7 @@ TOOL_ARGS = {
     "booking_preview": {"origin", "destination", "date", "language"},
     "recipe_plan": {"recipe", "servings", "less_spicy", "language"},
     "dish_suggestions": {"language"}, "inventory_list": {"language"},
+    "checkout_handoff": {"kind", "merchant_url", "details", "language"},
 }
 
 
@@ -130,6 +132,17 @@ class HomeAgent:
                     result["summary"] = say(language, "train_missing")
             else:
                 raise AppError("Unknown train provider configuration.", 503, "CONFIGURATION_ERROR")
+        elif name == "checkout_handoff":
+            kind = text(args.get("kind"), "handoff kind", 10)
+            if kind not in {"bill", "food"}:
+                raise AppError("Choose bill or food handoff.")
+            destination = public_url(args.get("merchant_url"))
+            details = text(args.get("details"), "draft details", 1000)
+            result = {"mode": "draft", "destination": destination, "details": details, "kind": kind,
+                      "verified": False, "external_action_executed": False,
+                      "summary": "Handoff draft saved. Open the provider to verify details and complete the transaction yourself. No bill was paid or order placed.",
+                      "required_review": (["Verify the biller and consumer account in the provider's app.", "Check the current bill, due date, fees and total.", "Authorize payment in the provider's secure flow; verify its receipt."] if kind == "bill" else ["Verify restaurant, exact items, quantities and customizations.", "Verify delivery address, availability, fees and final total.", "Place the order in the provider's app; verify its order reference."])}
+            status = "needs_input"
         elif name == "bill_preview":
             account = text(args.get("account"), "demo account", 40).upper()
             if not re.fullmatch(r"DEMO-[A-Z0-9-]{1,30}", account):
@@ -220,7 +233,7 @@ class HomeAgent:
         with self.store.transaction() as db:
             task = self.store.decode(db.execute("SELECT * FROM tasks WHERE id=?", (task_id,)).fetchone())
             self._task_access(task, actor)
-            if task["status"] not in {"needs_input", "awaiting_approval", "planned", "cancelled"}:
+            if task["status"] not in {"needs_input", "awaiting_approval", "planned", "cancelled"} and not (task["kind"]=="web_research" and task["status"]=="running"):
                 raise AppError("Completed tasks cannot be cancelled.", 409, "INVALID_STATE")
             result = {**task["result"], "summary": say(task["args"].get("language", "en"), "cancelled")}
             return self.store.save_task(db, task["kind"], task["actor"], task["args"], result, "cancelled", task["session"], task_id)
