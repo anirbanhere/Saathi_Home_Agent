@@ -43,10 +43,12 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 ## Deployment record
 
 - URL: https://home-agents-xswei7prnq-uc.a.run.app . Public invocation is scoped to this Cloud Run service.
-- Verified working revision: `home-agents-00002-cjn`; image build `467d435a-7a75-4a98-ad6d-6d3a917385c0`.
+- Current ready revision: `home-agents-00003-qzh`; image build `4da2e8be-7c97-441a-a9c3-8f5a14a905c5`. Previous verified working revision: `home-agents-00002-cjn`.
 - First revision had a malformed combined environment value from PowerShell; the YAML configuration corrected it. Use the second verified revision, not the first, for rollback.
 - Public HTTPS checks passed: health, synthetic recipe plan and meal completion, saved inventory, persisted sandbox approval with duplicate protection, and separate anonymous visitor state.
 - 48 Python tests passed. JavaScript syntax/markup checks passed. Hosted dependency audit reported no known vulnerabilities.
 - The browser loaded the actual hosted state and model controls. A live model request returned the provider's 429; complete a successful synthetic tool loop after a permitted provider becomes available before claiming live inference acceptance.
 - Key validation succeeded. Its filtered catalog initially allowed only Gemma 4 26B free; that upstream provider was rate-limited while account metadata still reported the 50-request allowance. Adding alternate free models is pending the user's settings update. No provider guardrails were modified by this app.
-- Final UI-only source build `4da2e8be-7c97-441a-a9c3-8f5a14a905c5` is in progress; update this record after its deployment and browser checks.
+- Final hosted UI loaded correctly, including provider choice and server-storage labels. No console errors/warnings were present after the successful page load. A narrow browser viewport had no horizontal overflow; a requested 390px window was constrained to 500px, so this does not establish a 390px device test.
+- Private GitHub source: https://github.com/anirbanbiswas91/home-agents . The Checks workflow passed for source commit `fa0b72387a110ac84c0acdab4f3c06cb233d517e`: https://github.com/anirbanbiswas91/home-agents/actions/runs/40334299072 . Later documentation commits do not change the deployed image.
+- Final synthetic inference request through the public website still returned the truthful HTTP 429 response. Live model-to-tool acceptance remains pending; no paid or offline fallback was substituted.
