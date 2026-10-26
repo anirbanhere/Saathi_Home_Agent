@@ -6,6 +6,9 @@ Last updated: 26 October 2026, Asia/Kolkata.
 - Three domains: everyday tasks first, then cooking and inventory. Original languages: Tamil, Malayalam, Kannada, Hindi; English is also required.
 - Intended primary interface: WhatsApp voice. Immediate delivery priority: a public website with running Python and executable model-driven tools.
 - Models must be interchangeable. Initial preference is OpenRouter free inference, with a Meta adapter once access is ready. No automatic paid fallback.
+- Task execution uses a hybrid approach: reuse reliable APIs, inspect suitable public sites through an isolated browser, and hand off account/checkout steps. End users should not need their own developer API key for every task. Operator-managed providers remain useful when browser access is blocked or unreliable.
+- Public browser execution is a private Cloud Run service without household storage or model/railway secrets. It accepts structured read actions only, with fresh contexts and public-IP egress checks. Website research steps save source evidence and can resume; they do not yet run after the client closes.
+- Bills and food orders can have unverified handoff drafts; no real money or orders are executed. Strong identity, account sessions and a durable transaction store precede financial automation.
 - The user selected an owned, clearly labeled demo clinic calendar for a later appointment workflow. Do not claim an external clinic integration.
 - GCP project: `sathi-home-agent`, number `59012364414`; selected region: `us-central1`. Billing is linked. The user reported INR 15,000 resources, but exact remaining credit/expiry/quotas have not been verified.
 - Website access: public link sharing is authorized. Browser workspaces remain separate until real household identity/sharing is implemented.

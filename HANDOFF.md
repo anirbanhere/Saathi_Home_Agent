@@ -4,9 +4,20 @@ Updated: 26 October 2026, Asia/Kolkata. Active branch: `codex/home-agent-demo`.
 
 ## Immediate objective
 
-Maintain the deployed public GCP website and finish live free-model tool verification. The canonical source repository is `https://github.com/anirbanhere/Saathi_Home_Agent`, preserving its public visibility. Application source, agent context files, history and CI are synchronized there.
+Latest user request: update the hybrid API/browser/account-handoff plan and implement as far as practical. The website now has a real private Chromium worker, resumable public research and bill/food handoff drafts. The canonical source repository is `https://github.com/anirbanhere/Saathi_Home_Agent`, preserving its public visibility.
 
-Current user priority completed: live train running-status integration is deployed through RailRadar, with a direct form independent of the LLM. Public provider lookup/persistence verification passed. The LLM provider's earlier access/rate-limit dependency remains separate.
+Latest release details: `docs/hybrid-browser.md`, spec `docs/hybrid-agent-spec.md`, delivery plan `tasks/hybrid-agent-plan.md`. Live railway functionality remains deployed. The permitted LLM provider still returns 429; no successful live model-to-browser answer is claimed.
+
+## Latest hybrid checkpoint
+
+- Deployed website revision `home-agents-00007-r6f`, build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`. Previous verified website revision `home-agents-00006-x47` is the rollback target.
+- Private worker `home-agents-browser`, revision `home-agents-browser-00001-w2m`, build `0604bf8b-5c08-4f48-84d5-a2b4d8f5f07f`. Dedicated identity `home-agents-browser@sathi-home-agent.iam.gserviceaccount.com`, no mounted secrets/project-data roles. Its only invoker binding grants the website runtime access; public access returned403. Configuration lives in `deploy/gcp/env.yaml`; both existing model/railway secret refs remain.
+- Structured public-page worker uses actual Chromium1.64.1, fresh context and DNS-validated/pinned public-IP proxy; no arbitrary model code/account login/transaction capability. Worker memory1Gi, CPU1, concurrency1, max1/min0.
+- `ResearchTasks` supports visitor-owned start/step/resume/cancel, persisted version/source/trace, free-model authorization and exact-quote source validation. Direct page inspection requires no model. Six steps maximum, 20 tasks per visitor. Browser API routes `/api/browser/tasks` and `/api/browser/tasks/<id>/steps`; task cancellation uses existing endpoint. Steps are client/request-driven; closing the tab stops further steps after the current request.
+- Assistant tool `start_web_research` queues research; UI advances it. Existing model behavior remains bounded/free-only. `checkout_handoff` is an owner-only bill/food draft with validated provider URL and review checklist, never approve-to-execute or a receipt.
+- 80 Python tests passed. Actual private worker read a public page and filled/submitted Python.org search. Public website→private worker→saved evidence, repeat-step handling and checkout draft verified with fresh synthetic visitors. Actual browser form displayed completion/source history with no console errors/warnings. Browser dependency audit found no known vulnerabilities. Final GitHub CI is recorded below after push.
+- Actual synthetic free-model research inspected Python.org, then paused with `RATE_LIMITED`/429 and retained its source. Only Gemma4 26B remains key-permitted. No paid fallback or guardrail change. IndiGo returned403/Access Denied; worker correctly produced `needs_input`, not a flight report.
+- Restricted Hermes plugin added in `integrations/hermes-public-browser/`, registration/handler validated. Inspected upstream commit `d49e2ebbaed42718659c13f82c04cde7d8ab10bd` requires PM-managed Python3.14; do not install an unrelated PyPI package into this app's3.12 environment. Actual Hermes runtime/session and hosted task-state integration remain unverified.
 
 ## Completed locally
 
@@ -34,7 +45,7 @@ Current user priority completed: live train running-status integration is deploy
 - Railway key is in Secret Manager as `home-agents-railradar-key`, version 1; runtime accessor grant is scoped to this secret. Production YAML selects `HOME_AGENT_TRAIN_PROVIDER=railradar`. Deploy with both secret references; never paste the actual key in source or CLI arguments.
 - A project-wide builder grant was rejected by approval review. It was replaced by repository-scoped artifact writer and build-bucket object access plus bucket metadata read. No project-wide builder grant was applied.
 - Public URL: `https://home-agents-xswei7prnq-uc.a.run.app`.
-- Current ready revision: `home-agents-00005-kng`, image build `f5de38ad-61e4-4c1c-9664-9590cf4cdcc2`. Previous working revision: `home-agents-00004-7mn` (before railway integration). The first revision had an environment-argument parsing failure; do not use it for rollback.
+- Current ready revision: `home-agents-00007-r6f`, image build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`. Previous working revision: `home-agents-00006-x47` (initial hybrid release). The first revision had an environment-argument parsing failure; do not use it for rollback. Private worker details are in the latest checkpoint above.
 - Final browser UI labels/model controls verified, with no console errors/warnings on successful load. Narrow-window layout had no horizontal overflow at the actual 500px viewport; smaller device widths were not newly verified.
 - Always use `--env-vars-file=deploy/gcp/env.yaml`. An unquoted comma-separated PowerShell argument previously merged the bucket and model into one invalid value.
 
@@ -47,10 +58,10 @@ Latest diagnostic: NVIDIA Nemotron 3 Super free is still in the public catalog, 
 ## Next actions
 
 Repository migration is complete. Do not repeat authentication, repository creation or initial source migration. Preserve the earlier repository and its remote.
-1. Await confirmation that additional free models were allowed; the latest filtered-catalog check still returned Gemma 4 26B only. The final public synthetic inference request also returned HTTP 429.
-2. When available, select an allowed alternative through Connections (or update `deploy/gcp/env.yaml` and the service default), then complete a synthetic-only live tool loop. This is the remaining inference acceptance condition, not a reason to claim a mock is live.
-3. Update this handoff and deployment evidence after that real inference check. The website/tools/GitHub work is already deployed and verified; do not restart infrastructure setup.
-4. Keep `.env`, artifacts, databases and Sites checkout excluded. Train integration is complete; further WhatsApp, speech and clinic-calendar work remains subject to the active user priority. Do not restart railway account setup or substitute fixtures for provider failures.
+1. Recheck the key-permitted catalog after the user allows additional free models; currently Gemma4 26B only and actual inference returns429. Then verify a synthetic real model→browser→quoted answer and assistant→queued research journey. Do not call mocked tests live inference evidence.
+2. Connect the restricted Hermes plugin in a separate supported source environment with only its browser toolset, workload identity and no personal context. Verify a real model session before advertising Hermes connected. Do not reinstall infrastructure or move arbitrary-code tools onto the website host.
+3. Extend task/background/account identity before WhatsApp or authenticated transactions. Scope real payments/orders separately with durable operation/approval/reconciliation storage; current drafts deliberately require manual provider completion.
+4. Keep `.env`, artifacts, databases and Sites checkout excluded. Railway integration remains complete. Continue voice/clinic roadmap only according to the user's next priority; preserve existing model guardrails and sandbox labels.
 
 ## Scope and evidence limits
 

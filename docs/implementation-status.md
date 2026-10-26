@@ -1,5 +1,7 @@
 # Implementation status — 26 October 2026
 
+Hybrid update: the public site now includes isolated Chromium page inspection, saved/resumable research, assistant-to-research routing and bill/food checkout handoff drafts. Actual browser navigation/form actions and public website persistence were verified. The permitted free model still returns 429; no successful live AI research answer is claimed. The Hermes plugin's registration/handler is tested, but a real Hermes session is not connected. See [hybrid implementation and operations](hybrid-browser.md).
+
 Hosted update: the Python Cloud Run website, free-model tool loop, visitor isolation, and durable snapshots are documented in [hosted-deployment.md](hosted-deployment.md). The original local prototype evidence below remains valid for that edition. Consult HANDOFF.md for live inference availability and the latest release checks.
 
 Railway update: RailRadar reports and a direct lookup form are deployed and verified on the public website, independently of LLM availability; see [live-trains.md](live-trains.md). The local prototype below still defaults to fixtures. Bills and journey bookings remain sandboxes.

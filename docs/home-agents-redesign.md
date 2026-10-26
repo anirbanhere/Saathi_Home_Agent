@@ -6,6 +6,8 @@ This is the current design direction. It supersedes the workflow ordering and fi
 
 Delivery update: the user subsequently prioritized an executable public website before WhatsApp. The immediate Cloud Run deployment is documented in `hosted-deployment.md` and ADR-002; the VM and clinic-first sequence below remain broader design proposals, not the website's current topology or shipped feature list.
 
+Hybrid execution update: [hybrid-agent-spec.md](hybrid-agent-spec.md) supersedes the earlier API-per-capability delivery order. Public browser research is now deployed alongside existing API tools; bills/food orders have manual handoff drafts. Account-based execution, WhatsApp voice and real payments remain later work.
+
 ## Inputs and scope
 
 The user requires interchangeable models, a primarily WhatsApp voice experience, GCP as an available hosting platform, and Tamil, Malayalam, Kannada, Hindi, and English. Everyday tasks remain first priority; cooking and inventory remain part of the product. The user has selected a demo clinic calendar that we control.

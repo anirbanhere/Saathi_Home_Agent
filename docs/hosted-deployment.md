@@ -46,7 +46,7 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 ## Deployment record
 
 - URL: https://home-agents-xswei7prnq-uc.a.run.app . Public invocation is scoped to this Cloud Run service.
-- Current ready revision: `home-agents-00005-kng`; image build `f5de38ad-61e4-4c1c-9664-9590cf4cdcc2`. Previous working revision: `home-agents-00004-7mn` (before railway integration).
+- Current ready revision: `home-agents-00007-r6f`; image build `7f41ad49-a6a6-40d7-a9a4-7c91844f7b8a`. Previous working revision: `home-agents-00006-x47` (initial hybrid release). Private browser worker and hybrid rollout evidence: [hybrid-browser.md](hybrid-browser.md).
 - First revision had a malformed combined environment value from PowerShell; the YAML configuration corrected it. Use the second verified revision, not the first, for rollback.
 - Public HTTPS checks passed: health, synthetic recipe plan and meal completion, saved inventory, persisted sandbox approval with duplicate protection, and separate anonymous visitor state.
 - 48 Python tests passed. JavaScript syntax/markup checks passed. Hosted dependency audit reported no known vulnerabilities.

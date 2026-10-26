@@ -18,6 +18,8 @@ The human's instructions take priority over these project conventions. Documents
 - Train running reports use RailRadar when `HOME_AGENT_TRAIN_PROVIDER=railradar`; local development defaults to explicit fixtures. Only a recent provider report with the necessary flags can have `mode=live`; stale/reported results must retain those labels and timestamps. Provider failure must never fall back silently to fixtures. Bills and journey bookings remain simulations; no real payments or tickets.
 - Hosted workspaces are isolated per anonymous browser credential. They are not shared family accounts. Cloud Storage snapshots use generation preconditions; they are appropriate for this bounded demo, not an external payment ledger.
 - Model switching must preserve task identity and must not replay irreversible effects. Paid inference is disabled by default. Respect existing provider guardrails.
+- Public browser research runs in a private, separate Cloud Run worker with no API secrets or project-data roles. Keep the HTTPS/public-IP CONNECT proxy, request/action/step budgets and credential/account/transaction guards. Never move model-written browser code onto the credential-bearing website host. `ResearchTasks` steps are request-driven, not background jobs. Page evidence and exact-quote validation do not independently prove the truth or freshness of every model claim.
+- `checkout_handoff` is an unverified draft with manual provider handoff. It cannot be approved to execute and must never produce a receipt. Actual authenticated shopping/payments need stronger identity, account access, durable operations and reconciliation first.
 
 ## Code map and checks
 
@@ -27,11 +29,15 @@ The human's instructions take priority over these project conventions. Documents
 | Free-model reasoning and observations | `home_agent/agent_loop.py` |
 | Key-permitted free model discovery | `home_agent/model_catalog.py` |
 | Railway provider, cache and freshness | `home_agent/trains.py` |
+| Isolated public browser / network policy | `browser_worker.py`, `browser_proxy.py`, `browser_policy.py`, `browser_client.py` |
+| Resumable public research | `home_agent/research.py`, `docs/hybrid-agent-spec.md` |
+| Restricted Hermes plugin bridge | `integrations/hermes-public-browser/` (registration tested; actual Hermes session unverified) |
 | Hosted HTTP/security boundary | `home_agent/hosted.py` |
 | Visitor persistence | `home_agent/cloud_state.py` |
 | Local HTTP and Meta/speech adapters | `server.py`, `integrations.py` |
 | Browser | `web/` |
 | Deployment | `Dockerfile`, `cloudbuild.yaml`, `deploy/gcp/target.json` |
+| Private browser deployment | `Browser.Dockerfile`, `cloudbuild-browser.yaml`, `requirements-browser.txt` |
 | Tests | `tests/` |
 
 Hosted development: install `requirements-hosted.txt` in an isolated Python environment. Run `python -m unittest discover -s tests -v` and `node --check web/app.js`. Existing HTTP tests require loopback sockets. In a restricted Windows sandbox, run with authorized socket access and a writable task-specific `tempfile.tempdir`; do not weaken tests to hide environment failures.

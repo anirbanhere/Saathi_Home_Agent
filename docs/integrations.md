@@ -81,6 +81,8 @@ Audio is capped at 5 MB. Accepted output MIME types are audio/wav, audio/mpeg, a
 
 ## Primary documentation consulted
 
+New restricted browser bridge: [`integrations/hermes-public-browser/README.md`](../integrations/hermes-public-browser/README.md). It uses the same private browser client and policy as hosted research, without arbitrary-code tools. This plugin is prepared and handler-tested; actual Hermes orchestration remains unverified. The earlier MCP household server remains a separate local integration.
+
 - [Hermes MCP configuration](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp)
 - [Meta Chat Completions](https://dev.meta.ai/docs/protocols/chat-completions)
 - [MCP stdio transport](https://modelcontextprotocol.io/specification/2025-03-26/basic/transports)
