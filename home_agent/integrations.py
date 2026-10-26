@@ -40,6 +40,10 @@ def post_json(url, payload, key=""):
             raise ValueError("Expected object")
         return result
     except HTTPError as error:
+        if error.code == 429:
+            raise AppError("The free model provider is busy or its request allowance is exhausted. Try another permitted free model in Connections, or retry later.", 429, "RATE_LIMITED") from None
+        if error.code == 404:
+            raise AppError("This model is unavailable or blocked by your provider account settings. Choose another permitted model.", 502, "MODEL_UNAVAILABLE") from None
         raise AppError(f"Inference service returned HTTP {error.code}. Check local configuration.", 502, "PROVIDER_ERROR") from None
     except (URLError, TimeoutError, OSError):
         raise AppError("Inference service is unavailable or timed out. No transaction was executed.", 502, "PROVIDER_ERROR") from None
