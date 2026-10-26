@@ -4,9 +4,9 @@ Updated: 26 October 2026. Public Python service: https://home-agents-xswei7prnq-
 
 ## Runtime
 
-The website serves the actual Python application on Cloud Run in `us-central1`, rather than the earlier browser-only Sites edition. `Dockerfile` uses Gunicorn and the Flask factory in `home_agent/hosted.py`. The public configuration references the OpenRouter credential through Secret Manager; the key is not returned to browsers.
+The website serves the actual Python application on Cloud Run in `us-central1`, rather than the earlier browser-only Sites edition. `Dockerfile` uses Gunicorn and the Flask factory in `home_agent/hosted.py`. The public configuration references separate OpenRouter and RailRadar credentials through Secret Manager; neither key is returned to browsers.
 
-`agent_loop.py` performs at most three inference requests and two validated tool calls per turn, giving observations back to the model. It is an application-owned loop; Hermes is not connected. Available tools read inventory, suggest dishes, create recipe plans, read train fixtures, and prepare sandbox bills/journeys. Human controls execute sandbox approvals and record estimated meal consumption. Real payments, ticket issuance, clinic booking, WhatsApp and hosted speech are not connected.
+`agent_loop.py` performs at most three inference requests and two validated tool calls per turn, giving observations back to the model. It is an application-owned loop; Hermes is not connected. Available tools read inventory, suggest dishes, create recipe plans, fetch RailRadar train reports (fixtures in explicitly selected local development), and prepare sandbox bills/journeys. Activity's direct railway form does not require an LLM response. Human controls execute sandbox approvals and record estimated meal consumption. Real payments, ticket issuance, clinic booking, WhatsApp and hosted speech are not connected.
 
 Only explicitly free model routes are accepted. The selector is populated from the configured key's `/models/user` catalog, requiring zero prompt/completion pricing and tools/tool_choice support. The backend rejects a selected ID absent from that catalog before inference. Successful catalog lookups are cached for 60 seconds, failures for 15; failure offers no unverified fallback choices. Permission to use a model does not establish upstream capacity. Provider 429 responses are shown as a busy/quota state; there is no paid fallback or silent offline substitution. An in-process limiter caps this service at 15 model calls/minute and 45/day while the process is alive; it resets on restart and is not an account-wide quota ledger. OpenRouter's own limits remain authoritative.
 
@@ -25,6 +25,7 @@ Per-request local database files are temporary. Saved state lives in Cloud Stora
 - Build/source/log bucket `sathi-home-agent-build-59012364414`: private; builder identity has bucket-scoped object and metadata access.
 - Artifact Registry repository `home-agents`: builder identity has repository-scoped writer access.
 - Secret `home-agents-openrouter-key`: runtime identity has accessor permission on this secret only.
+- Secret `home-agents-railradar-key`: separate runtime accessor grant scoped to this railway credential; production selects the RailRadar provider.
 - Runtime and builder identities are separate. No exported service-account keys and no project-wide builder grant.
 - Cloud Run target: one maximum instance, zero minimum instances, one CPU, 512 MiB, request-based execution, 240-second request timeout. Build/storage/hosting can consume GCP credits even though model routes are free.
 
@@ -34,7 +35,7 @@ Install `requirements-hosted.txt` for hosted development. For local smoke tests,
 
 Before building, inspect `gcloud meta list-files-for-upload`. The allowlist includes only Python runtime sources, web assets, Dockerfile, hosted requirements and Cloud Build configuration. It excludes `.env`, recordings, artifacts, databases, Git metadata and agent memory files.
 
-Build with `gcloud builds submit . --config=cloudbuild.yaml --gcs-source-staging-dir=gs://sathi-home-agent-build-59012364414/source --service-account=projects/sathi-home-agent/serviceAccounts/home-agents-build@sathi-home-agent.iam.gserviceaccount.com --project=sathi-home-agent`. Deploy the resulting immutable image to the `home-agents` Cloud Run service with the runtime identity, `--env-vars-file=deploy/gcp/env.yaml`, and `--set-secrets=OPENROUTER_API_KEY=home-agents-openrouter-key:1`. Use the YAML file instead of an unquoted comma-separated environment argument in PowerShell; that was observed to join two values incorrectly. Verify the deployed non-secret environment fields before smoke testing. Check tests and authenticated build status before deploying.
+Build with `gcloud builds submit . --config=cloudbuild.yaml --gcs-source-staging-dir=gs://sathi-home-agent-build-59012364414/source --service-account=projects/sathi-home-agent/serviceAccounts/home-agents-build@sathi-home-agent.iam.gserviceaccount.com --project=sathi-home-agent`. Deploy the resulting immutable image to the `home-agents` Cloud Run service with the runtime identity, `--env-vars-file=deploy/gcp/env.yaml`, and `--set-secrets='OPENROUTER_API_KEY=home-agents-openrouter-key:1,RAILRADAR_API_KEY=home-agents-railradar-key:1'`. Preserve both secret references. Use the YAML file for literal environment values and quote the comma-separated secret-reference argument in PowerShell; an unquoted environment argument previously joined two values incorrectly. Verify deployed non-secret fields and secret references before smoke testing. Check tests and authenticated build status before deploying.
 
 ## Verification and rollback
 
@@ -45,7 +46,7 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 ## Deployment record
 
 - URL: https://home-agents-xswei7prnq-uc.a.run.app . Public invocation is scoped to this Cloud Run service.
-- Current ready revision: `home-agents-00004-7mn`; image build `8c3e9e77-66ad-4c41-8fa7-73bd1c34820c`. Previous working revision: `home-agents-00003-qzh` (older fixed model selector).
+- Current ready revision: `home-agents-00005-kng`; image build `f5de38ad-61e4-4c1c-9664-9590cf4cdcc2`. Previous working revision: `home-agents-00004-7mn` (before railway integration).
 - First revision had a malformed combined environment value from PowerShell; the YAML configuration corrected it. Use the second verified revision, not the first, for rollback.
 - Public HTTPS checks passed: health, synthetic recipe plan and meal completion, saved inventory, persisted sandbox approval with duplicate protection, and separate anonymous visitor state.
 - 48 Python tests passed. JavaScript syntax/markup checks passed. Hosted dependency audit reported no known vulnerabilities.
@@ -55,3 +56,4 @@ Keep the previous verified Cloud Run revision before subsequent releases. Roll b
 - Canonical source repository: https://github.com/anirbanhere/Saathi_Home_Agent . Source, agent context files and history are synchronized to `main`, with GitHub Actions enabled. CI passed for `83dde072139063e1134a7aa07cb44ae86bb912e3`: https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40336291687 . Repository-documentation changes do not change the deployed image.
 - Final synthetic inference request through the public website still returned the truthful HTTP 429 response. Live model-to-tool acceptance remains pending; no paid or offline fallback was substituted.
 - Model-permission fix verified on the public service: catalog is authenticated/verified and lists only Gemma 4 26B for the current key; a stale NVIDIA selection returns 403 `MODEL_NOT_ALLOWED` before inference. 54 Python tests and JavaScript syntax checks passed. Fix CI: https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40337885812 . This fixes selection/error handling; it does not enable a model blocked in the provider account or create a live train-status integration.
+- Railway update: 62 tests passed; actual RailRadar reports verified locally and through the public website, including persisted direct-tool results independent of the LLM. See [railway integration](live-trains.md) for source, timestamps, stale/estimated handling and free-tier limits. Both production secret references and the selected railway provider were verified.

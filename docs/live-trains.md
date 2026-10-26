@@ -22,4 +22,5 @@ Responses are cached for two minutes per train/date/key, with a 32-entry process
 
 - 62 automated Python tests passed, including normalized fields, stale/estimated/missing/future timestamps, cache freshness, record mismatch, no fixture fallback, missing key/future date, and direct hosted lookup without an LLM. Synthetic tests do not count as live feed verification.
 - Actual authenticated provider calls succeeded for train 12069 (completed journey, older update correctly labeled stale) and 12627 (running, recent provider report). The credential was streamed into Secret Manager without making an extra plaintext copy.
-- Public deployment/browser verification is pending at this checkpoint. Record the final revision in HANDOFF.md; do not present local provider tests as a verified public deployment.
+- Deployed revision `home-agents-00005-kng`, image build `f5de38ad-61e4-4c1c-9664-9590cf4cdcc2`. The public tool returned a recent 12627 running report with source/update times and persisted it to visitor task history without an LLM call. The browser form loaded with the correct India-time date and provider configuration.
+- CI passed: https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40347816704 . The earlier LLM provider access/rate-limit problem is independent of this direct railway lookup.
