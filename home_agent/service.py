@@ -12,6 +12,7 @@ from .catalog import ALIASES, RECIPES, TRAINS
 from .errors import AppError, number, text
 from .languages import LANGUAGES, detect_language, say
 from .store import Store, now
+from .trains import DEFAULT_FEED, configuration as train_configuration
 
 DEFAULT_DB = Path(__file__).resolve().parent.parent / "data" / "home-agent.sqlite3"
 HOUSEHOLD_TOOLS = {"inventory_list", "recipe_plan", "dish_suggestions"}
@@ -52,8 +53,9 @@ def normalize_item(name, quantity, unit):
 
 
 class HomeAgent:
-    def __init__(self, path=DEFAULT_DB):
+    def __init__(self, path=DEFAULT_DB, train_feed=None):
         self.store = Store(Path(path))
+        self.train_feed = train_feed or DEFAULT_FEED
 
     @staticmethod
     def _actor(actor):
@@ -112,16 +114,22 @@ class HomeAgent:
             if not re.fullmatch(r"\d{5}", train_number):
                 raise AppError("Train number must have exactly five digits.")
             travel_date = valid_date(args.get("date"))
-            train = TRAINS.get(train_number)
-            result = {"mode": "fixture", "source": "Local demonstration fixture; never a live train feed",
-                      "requested_date": travel_date, "retrieved_at": now(), "train_number": train_number}
-            if train:
-                result.update(train)
-                result["summary"] = say(language, "train_result", name=train["name"], delay=train["sample_delay_minutes"],
-                                        station=train["sample_station"], date=travel_date)
+            provider = train_configuration()["provider"]
+            if provider == "railradar":
+                result = self.train_feed.lookup(train_number, travel_date, language)
+            elif provider == "fixture":
+                train = TRAINS.get(train_number)
+                result = {"mode": "fixture", "source": "Local demonstration fixture; never a live train feed",
+                          "requested_date": travel_date, "retrieved_at": now(), "train_number": train_number}
+                if train:
+                    result.update(train)
+                    result["summary"] = say(language, "train_result", name=train["name"], delay=train["sample_delay_minutes"],
+                                            station=train["sample_station"], date=travel_date)
+                else:
+                    status = "failed"
+                    result["summary"] = say(language, "train_missing")
             else:
-                status = "failed"
-                result["summary"] = say(language, "train_missing")
+                raise AppError("Unknown train provider configuration.", 503, "CONFIGURATION_ERROR")
         elif name == "bill_preview":
             account = text(args.get("account"), "demo account", 40).upper()
             if not re.fullmatch(r"DEMO-[A-Z0-9-]{1,30}", account):
@@ -376,7 +384,7 @@ class HomeAgent:
             if task:
                 reply = task["result"]["summary"]
             response = {"reply": reply, "language": language, "task": task, "mode": "offline",
-                        "notice": "Limited phrase matching and templates; no live LLM or service call."}
+                        "notice": "Limited phrase matching; no LLM. Train source and freshness are identified in the task result."}
             db.execute("INSERT INTO messages(session,request_id,fingerprint,language,user_text,response,created_at) VALUES (?,?,?,?,?,?,?)",
                        (session, request_id, fingerprint, language, content, json.dumps(response), now()))
             return response

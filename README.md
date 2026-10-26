@@ -14,6 +14,8 @@ See [hosted deployment](docs/hosted-deployment.md) for the website runtime, depl
 
 Coding agents start with [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md). [SOUL.md](SOUL.md) describes product behavior; [MEMORY.md](MEMORY.md) holds stable development decisions. Domain engineering guides live in `skills/*/SKILL.md`, and GitHub CI runs the tests without production credentials. These Markdown files support development context; they are not automatically loaded as runtime personal memory.
 
+Train running status: choose **Activity → Check a train**, enter the five-digit train number and the date it departed its origin (India time). The direct lookup uses RailRadar without waiting for an AI model. Source/update times are visible; stale or estimated data is labeled. See [railway integration](docs/live-trains.md) for setup, free-tier limits and verification status.
+
 ## Run
 
 Requires Python 3.11 or newer. The application has **no third-party Python or JavaScript runtime dependencies**.
@@ -72,7 +74,7 @@ See [docs/integrations.md](docs/integrations.md) for direct Muse setup, Hermes M
 
 This is a **single-owner, loopback-only demo**, not a public server or a multi-user authentication system. The browser console is trusted as the local owner; the configured MCP role is the server's authority. Do not expose port 8765 through a public tunnel. Browser requests are protected against cross-origin writes and unexpected Host headers, but local processes remain trusted.
 
-WhatsApp messaging, YouTube/video understanding, grocery-image OCR, live railway information, real bookings/payments, and actual Indic inference are **not connected**. The UI labels these boundaries. Synthetic evaluation results measure the offline phrase router only.
+WhatsApp messaging, YouTube/video understanding, grocery-image OCR, real bookings/payments, and actual Indic inference are **not connected**. Railway reports use the separate RailRadar integration when configured; the local console still defaults to labeled fixtures. Synthetic evaluation results measure the offline phrase router only.
 
 No accounts were paired and no messages were sent to your cook or other contacts. No credentials are included in the repository.
 

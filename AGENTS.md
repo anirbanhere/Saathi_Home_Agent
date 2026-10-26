@@ -15,7 +15,7 @@ The human's instructions take priority over these project conventions. Documents
 - Hosted runtime: `home_agent/hosted.py`, `cloud_state.py`, and `agent_loop.py`. The localhost server in `server.py` remains a separate trusted-owner development mode.
 - The hosted agent uses a bounded application tool loop with OpenRouter free models. Do not describe Hermes as connected until a real integration is verified.
 - Model output may propose tool calls. Application code validates them. Human UI controls retain approvals, cancellation, and stock-consumption commits.
-- Train data is fixtures. Bills and journey bookings are local simulations. Do not describe these as live providers, real payments, or real tickets.
+- Train running reports use RailRadar when `HOME_AGENT_TRAIN_PROVIDER=railradar`; local development defaults to explicit fixtures. Only a recent provider report with the necessary flags can have `mode=live`; stale/reported results must retain those labels and timestamps. Provider failure must never fall back silently to fixtures. Bills and journey bookings remain simulations; no real payments or tickets.
 - Hosted workspaces are isolated per anonymous browser credential. They are not shared family accounts. Cloud Storage snapshots use generation preconditions; they are appropriate for this bounded demo, not an external payment ledger.
 - Model switching must preserve task identity and must not replay irreversible effects. Paid inference is disabled by default. Respect existing provider guardrails.
 
@@ -26,6 +26,7 @@ The human's instructions take priority over these project conventions. Documents
 | Deterministic tools and transaction rules | `home_agent/service.py`, `store.py`, `contracts.py` |
 | Free-model reasoning and observations | `home_agent/agent_loop.py` |
 | Key-permitted free model discovery | `home_agent/model_catalog.py` |
+| Railway provider, cache and freshness | `home_agent/trains.py` |
 | Hosted HTTP/security boundary | `home_agent/hosted.py` |
 | Visitor persistence | `home_agent/cloud_state.py` |
 | Local HTTP and Meta/speech adapters | `server.py`, `integrations.py` |

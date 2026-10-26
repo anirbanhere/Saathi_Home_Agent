@@ -277,12 +277,22 @@ function taskCard(task, compact = false) {
           fixture: "SAMPLE DATA · Not live",
           curated: "CURATED RECIPE · English steps",
           inventory: "LOCAL HOUSEHOLD DATA",
+          live: "RECENT PROVIDER REPORT · Check update time",
+          stale: "STALE PROVIDER REPORT · Check again for current status",
+          reported: "PROVIDER REPORT · Freshness or position unverified",
         }[result.mode] || result.mode,
       ),
     );
   if (compact) card.append(el("p", "task-summary", result.summary));
   if (!compact && task.kind === "train_status") {
     card.append(el("p", "task-summary", result.summary));
+    if (result.mode !== "fixture" && result.source) {
+      const displayTime = (value) => value ? new Date(value).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) + " IST" : "Not reported";
+      card.append(el("p", "small-muted", `Source: ${result.source}`));
+      card.append(el("p", "small-muted", `Provider update: ${displayTime(result.provider_updated_at)} · Fetched: ${displayTime(result.retrieved_at)}`));
+      if (result.next_station) card.append(el("p", "small-muted", `Next reported stop: ${result.next_station}`));
+      card.append(el("p", "small-muted", "Saved result at the time fetched. Check again for the latest report. Position is reported, not guaranteed GPS."));
+    }
   }
   if (!compact && task.kind === "bill_preview")
     card.append(
@@ -506,10 +516,10 @@ function renderConnections() {
       data.tts,
     ],
     [
-      "Travel & payments",
-      "Train examples and transaction simulators; no real money moves and no tickets are issued.",
-      "Fixtures & sandbox",
-      false,
+      "Train running status",
+      data.train?.provider === "railradar" ? "RailRadar reports with source update time and freshness checks. Direct lookup is available in Activity." : "Offline train fixtures; live railway API is not selected.",
+      data.train?.configured ? "Provider key configured" : data.train?.provider === "railradar" ? "Needs railway API key" : "Sample data",
+      data.train?.configured,
     ],
     [
       "Kitchen memory",
@@ -567,17 +577,22 @@ function renderConnections() {
   $("#engine-hint").textContent = data.hosted
     ? "Free AI uses real model inference and tools. Offline mode uses a limited phrase matcher. Free provider capacity and account permissions can vary."
     : "The direct Muse adapter tests the same tool contracts. Hermes uses the separate MCP adapter; selecting Muse here does not run Hermes.";
+  $("#train-starter-note").textContent = data.train?.provider === "railradar" ? "Direct provider lookup" : "Sample running status";
+  $("#train-feed-note").textContent = data.train?.provider === "railradar"
+    ? (data.train.configured ? "RailRadar key configured. Results show the provider's latest report and update time; stale or estimated reports are labeled." : "The live train adapter is ready, but its railway API key is not configured yet.")
+    : "Offline fixtures selected. Results are sample data, not live running status.";
   $("#speech-note").textContent = data.asr
     ? "Indic endpoint configured"
     : "Speech service not connected";
   $("#mode-title").textContent = $("#engine").value === "openrouter" ? (models.length ? "Free AI configured" : "Free AI needs model access") :
     $("#engine").value === "muse" ? "Muse selected" : "Offline demo";
+  const trainLabel = data.train?.provider === "railradar" ? (data.train.configured ? "RailRadar train reports" : "Railway API key needed") : "Sample train data";
   $("#mode-description").textContent =
     $("#engine").value === "openrouter"
       ? (models.length ? "Key-permitted models only · Provider capacity varies · Sandbox travel & payments" : catalog?.message || "No permitted free model is available.")
       : $("#engine").value === "muse"
-      ? "Direct Meta API adapter · Sample train data · Sandbox transactions"
-      : "Limited phrase matching · Sample train data · Sandbox transactions";
+      ? `Direct Meta API adapter · ${trainLabel} · Sandbox transactions`
+      : `Limited phrase matching · ${trainLabel} · Sandbox transactions`;
 }
 async function sendMessage(value) {
   if (state.busy) return;
@@ -640,6 +655,11 @@ document.addEventListener("click", async (event) => {
   }
   const prompt = event.target.closest("[data-prompt]");
   if (prompt) {
+    if (prompt.dataset.prompt === "train" && state.data.integrations.train?.provider === "railradar") {
+      setView("activity");
+      $("#train-number").focus();
+      return;
+    }
     await sendMessage(prompts[$("#language").value][prompt.dataset.prompt]);
     return;
   }
@@ -778,6 +798,22 @@ $("#booking-form").addEventListener("submit", (event) => {
     toast("Sandbox quote ready. Review and approve the task card.");
   }, event.submitter);
 });
+$("#train-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  run(async () => {
+    $("#train-results").replaceChildren(el("p", "small-muted", "Checking the train report…"));
+    try {
+      const task = await api("/api/tools", { name: "train_status", arguments: {
+        train_number: $("#train-number").value.trim(), date: $("#train-date").value, language: $("#language").value,
+      }});
+      await refresh();
+      $("#train-results").replaceChildren(taskCard(task));
+    } catch (error) {
+      $("#train-results").replaceChildren(el("p", "inline-notice", error.message));
+      throw error;
+    }
+  }, event.submitter);
+});
 $("#audio-file").addEventListener("change", (event) =>
   run(async () => {
     const file = event.target.files[0];
@@ -812,4 +848,8 @@ $("#travel-date").value = [
   String(tomorrow.getMonth() + 1).padStart(2, "0"),
   String(tomorrow.getDate()).padStart(2, "0"),
 ].join("-");
+const indiaParts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map((part) => [part.type, part.value]));
+const indiaToday = `${indiaParts.year}-${indiaParts.month}-${indiaParts.day}`;
+$("#train-date").value = indiaToday;
+$("#train-date").max = indiaToday;
 run(refresh);

@@ -6,6 +6,8 @@ Updated: 26 October 2026, Asia/Kolkata. Active branch: `codex/home-agent-demo`.
 
 Maintain the deployed public GCP website and finish live free-model tool verification. The canonical source repository is `https://github.com/anirbanhere/Saathi_Home_Agent`, preserving its public visibility. Application source, agent context files, history and CI are synchronized there.
 
+Current user priority: connect live train running status. RailRadar provider verification succeeded, the direct form and shared tool are implemented, and production rollout is in progress. This work is explicitly authorized independently of the pending LLM provider access.
+
 ## Completed locally
 
 - Added a bounded OpenRouter tool/observation loop; paid model IDs are rejected.
@@ -13,6 +15,7 @@ Maintain the deployed public GCP website and finish live free-model tool verific
 - Added durable per-visitor SQLite snapshots in private Cloud Storage with generation guards. Successful responses follow persistence.
 - Browser includes free-model selection and visible agent action evidence. Original fixtures/sandbox labels remain.
 - Model-access fix: a cached server-side OpenRouter `/models/user` lookup now filters the selector to key-permitted, zero-priced free models with tools/tool_choice support. Blocked or stale model IDs are rejected before inference. Cache lifetime is 60 seconds; lookup failures do not restore unverified hardcoded options. UI separates configured access from provider capacity.
+- Train update: `home_agent/trains.py` implements RailRadar with identity/freshness validation, two-minute cache, bounded requests and no fixture fallback on failure. Activity includes a direct lookup that works without the LLM. The AI tool uses the same adapter and must preserve source/update/freshness. 62 Python tests passed, including direct hosted lookup without model access. Actual provider calls returned a fresh running report for 12627 and a stale completed report for 12069.
 - 48 Python tests passed, including hosted isolation, restart persistence, repeat-safe approvals, snapshot conflicts, rejected cross-origin requests and model boundaries. JavaScript syntax/markup checks passed. Hosted dependency audit found no known vulnerabilities.
 - Following the reported NVIDIA error, 54 Python tests passed, including catalog filtering/cache/error handling and rejecting blocked models before inference. JavaScript syntax check passed. Fix build `8c3e9e77-66ad-4c41-8fa7-73bd1c34820c` is deployed as `home-agents-00004-7mn`. Public checks verified the key-scoped catalog and a 403 `MODEL_NOT_ALLOWED` for stale NVIDIA selection before inference. CI passed for `b10aea86cd5486c322e27988e9bcbca8a64c2ed4`, run `40337885812`.
 - Public HTTPS tools were verified with a fresh sample workspace: recipe plan, meal completion, saved inventory, duplicate sandbox approval, and separate visitor isolation. Browser loaded the real hosted state and model controls; successful live inference remains unverified.
@@ -28,6 +31,7 @@ Maintain the deployed public GCP website and finish live free-model tool verific
 - Private build/source/log bucket: `sathi-home-agent-build-59012364414`.
 - Image repository: `us-central1-docker.pkg.dev/sathi-home-agent/home-agents`.
 - Key is in Secret Manager as `home-agents-openrouter-key`; never print/read it into handoff.
+- Railway key is in Secret Manager as `home-agents-railradar-key`, version 1; runtime accessor grant is scoped to this secret. Production YAML selects `HOME_AGENT_TRAIN_PROVIDER=railradar`. Deploy with both secret references; never paste the actual key in source or CLI arguments.
 - A project-wide builder grant was rejected by approval review. It was replaced by repository-scoped artifact writer and build-bucket object access plus bucket metadata read. No project-wide builder grant was applied.
 - Public URL: `https://home-agents-xswei7prnq-uc.a.run.app`.
 - Current ready revision: `home-agents-00004-7mn`, image build `8c3e9e77-66ad-4c41-8fa7-73bd1c34820c`. Previous working revision: `home-agents-00003-qzh` (older fixed model selector). The first revision had an environment-argument parsing failure; do not use it for rollback.
@@ -38,7 +42,7 @@ Maintain the deployed public GCP website and finish live free-model tool verific
 
 The OpenRouter key is valid. Its filtered catalog initially allowed only `google/gemma-4-26b-a4b-it:free`. That provider returned HTTP 429 with `upstream_provider_shared_pool`; account metadata reported 50 free requests remaining. A different model returned a guardrail rejection. The user said they will add Gemma 4 31B and Nemotron 3 Super free variants; this is not yet confirmation that they saved the change. Recheck the filtered catalog before selecting alternatives. Never weaken account guardrails or enable paid fallback.
 
-Latest diagnostic: NVIDIA Nemotron 3 Super free is still in the public catalog, but a synthetic request returned HTTP 404 explicitly stating “Model blocked by guardrail.” The key-scoped catalog still lists only Gemma 4 26B. The website's former hardcoded dropdown was also a bug because it advertised blocked choices; the fix above addresses that UI/server boundary without changing account guardrails. Train 12069 in the screenshot cannot receive live status from the current fixture tool, independently of inference access.
+Latest diagnostic: NVIDIA Nemotron 3 Super free is still in the public catalog, but a synthetic request returned HTTP 404 explicitly stating “Model blocked by guardrail.” The key-scoped catalog still lists only Gemma 4 26B. The website's former hardcoded dropdown was also a bug because it advertised blocked choices; the fix above addresses that UI/server boundary without changing account guardrails. The new RailRadar tool/form bypasses the LLM dependency for train queries; production verification is pending at this checkpoint.
 
 ## Next actions
 

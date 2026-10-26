@@ -11,6 +11,7 @@ from urllib.parse import parse_qs, urlsplit
 from .errors import AppError, text
 from .integrations import MusePlanner, speech_request
 from .service import HomeAgent
+from .trains import configuration as train_configuration
 
 STATIC = Path(__file__).resolve().parent.parent / "web"
 FILES = {"/": ("index.html", "text/html; charset=utf-8"), "/app.js": ("app.js", "text/javascript; charset=utf-8"),
@@ -22,7 +23,7 @@ def integrations():
     return {"muse": bool(os.environ.get("MODEL_API_KEY")), "asr": bool(os.environ.get("HOME_AGENT_ASR_URL")),
             "tts": bool(os.environ.get("HOME_AGENT_TTS_URL")), "hermes": "MCP adapter available; not connected by this server",
             "whatsapp": "Not connected", "travel": "Local fixtures", "payments": "Local sandbox",
-            "model": os.environ.get("META_MODEL", "muse-spark-1.3")}
+            "model": os.environ.get("META_MODEL", "muse-spark-1.3"), "train": train_configuration()}
 
 
 class Handler(BaseHTTPRequestHandler):

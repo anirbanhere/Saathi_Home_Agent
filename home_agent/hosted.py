@@ -15,6 +15,7 @@ from .cloud_state import VisitorState
 from .errors import AppError, text
 from .server import STATIC
 from .model_catalog import ModelCatalog
+from .trains import configuration as train_configuration
 
 COOKIE = "__Host-home-agent"
 DEFAULT_MODEL = "google/gemma-4-26b-a4b-it:free"
@@ -106,7 +107,8 @@ def create_app(repository=None, model_catalog=None):
             "hosted": True, "openrouter": bool(os.environ.get("OPENROUTER_API_KEY")), "muse": False,
             "model": selected, "models": catalog["models"], "model_catalog": catalog,
             "asr": False, "tts": False, "hermes": "Not connected; bounded application tool loop active",
-            "whatsapp": "Not connected", "travel": "Sample data", "payments": "Sandbox",
+            "whatsapp": "Not connected", "travel": "Live provider adapter" if train_configuration()["configured"] else "Train provider not connected" if train_configuration()["provider"] == "railradar" else "Sample data", "payments": "Sandbox",
+            "train": train_configuration(),
             "storage": "Private Cloud Storage snapshots" if repository.bucket_name else "Local visitor storage",
         }
         return jsonify(result)

@@ -9,6 +9,6 @@ Read `AGENTS.md`, `HANDOFF.md`, and the relevant tests first. Use `home_agent/se
 
 Collect exact required fields. Present a specific proposed action and make approval separate from interpretation/selection. Only application-authorized paths commit an action. Reject model-supplied approval flags. Record observations, references, status and idempotency. Check provider status before retrying an uncertain irreversible operation.
 
-Existing bill and journey tools are sandbox simulations; train lookups are fixtures. Preserve those labels. The owned clinic-calendar workflow is planned and needs explicit implementation/tests before it is advertised.
+Bill and journey tools remain sandbox simulations. Train running reports use the configured RailRadar adapter in production; local development defaults to fixtures. Preserve source, requested journey start date, provider update and retrieval times. Reject mismatched records; never label stale/estimated data live or use fixtures after provider failure. The owned clinic-calendar workflow remains planned.
 
 Verify duplicates, changed inputs, stale/mismatched authorization, cross-visitor access, provider failures and restart recovery. Automated live model tests use fresh synthetic-only state. This skill describes engineering practice and does not grant new tool permissions.

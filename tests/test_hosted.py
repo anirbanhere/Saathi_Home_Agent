@@ -6,6 +6,8 @@ from unittest.mock import patch
 from home_agent.cloud_state import VisitorState
 from home_agent.hosted import create_app
 from home_agent.model_catalog import ModelCatalog
+from home_agent.trains import TrainFeed
+from datetime import datetime, timezone
 
 BASE = "https://example.test"
 HEADERS = {"Origin": BASE, "X-Home-Agent": "local-console"}
@@ -98,3 +100,16 @@ class HostedTests(unittest.TestCase):
                 planner.assert_not_called()
         self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json["error"]["code"], "MODEL_NOT_ALLOWED")
+
+    def test_live_train_direct_tool_does_not_require_a_model(self):
+        stamp=datetime.now(timezone.utc)
+        payload={"success":True,"data":{"trainNumber":"12069","trainName":"Synthetic Train","startDate":stamp.date().isoformat(),"lastUpdatedAt":stamp.isoformat(),"status":"running","isLive":True,"delayMinutes":3}}
+        feed=TrainFeed(fetcher=lambda *args:payload,clock=lambda:stamp)
+        with patch.dict("os.environ", {"HOME_AGENT_TRAIN_PROVIDER":"railradar","RAILRADAR_API_KEY":"synthetic","OPENROUTER_API_KEY":""}), patch("home_agent.service.DEFAULT_FEED", feed), patch("home_agent.hosted.FreeModelAgent") as planner:
+            state=self.get()
+            self.assertTrue(state.json["integrations"]["train"]["configured"])
+            self.assertFalse(state.json["integrations"]["openrouter"])
+            response=self.post("/api/tools",{"name":"train_status","arguments":{"train_number":"12069","date":stamp.date().isoformat()}})
+            planner.assert_not_called()
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json["result"]["mode"],"live")

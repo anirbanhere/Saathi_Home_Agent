@@ -3,7 +3,7 @@ from .service import HOUSEHOLD_TOOLS
 
 LANGUAGE = {"type": "string", "enum": ["en", "ta", "ml", "kn", "hi"]}
 SCHEMAS = {
-    "train_status": ("Look up a LOCAL FIXTURE, never live train status. Supported samples: 12627, 12623, 12658. Ask for train number and explicit YYYY-MM-DD date first.",
+    "train_status": ("Get a train's running-status report from the server-configured railway provider, or explicitly labeled fixtures in offline development. Ask for a five-digit train number and its journey start date (departure from origin), YYYY-MM-DD. Inspect mode, provider_updated_at and source: only mode=live is a recent provider report; stale/reported data must not be called live. A provider failure is never a successful status.",
                      {"train_number": {"type": "string", "pattern": "^[0-9]{5}$"}, "date": {"type": "string", "format": "date"}}, ["train_number", "date"]),
     "bill_preview": ("Prepare a SANDBOX electricity bill for a DEMO- account. Does not pay. Human approval in the local console is required to execute.",
                      {"account": {"type": "string", "pattern": "^DEMO-[A-Z0-9-]+$"}}, ["account"]),

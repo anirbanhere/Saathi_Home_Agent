@@ -135,7 +135,7 @@
                 <button class="starter" data-prompt="train">
                   <span aria-hidden="true">↗</span
                   ><strong>Check a train</strong
-                  ><small>Sample running status</small></button
+                  ><small id="train-starter-note">Sample running status</small></button
                 ><button class="starter" data-prompt="bill">
                   <span aria-hidden="true">▤</span
                   ><strong>Take care of a bill</strong
@@ -330,6 +330,20 @@ Carrot,250,g</textarea
         </section>
 
         <section id="view-activity" class="view" aria-label="Activity">
+          <section class="panel form-panel">
+            <span class="small-label">TRAIN RUNNING STATUS</span>
+            <h2>Check a train.</h2>
+            <p id="train-feed-note">Select the date the train departed its origin. Provider reports may lag the train's actual position.</p>
+            <form id="train-form">
+              <label for="train-number">Five-digit train number</label>
+              <input id="train-number" value="12069" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" required />
+              <label for="train-date">Journey start date · India time</label>
+              <input id="train-date" type="date" required />
+              <button class="button primary" type="submit">Check running status ↗</button>
+            </form>
+            <p class="field-hint">This lookup uses the train-data tool directly and does not require an AI model response. Use the train's departure date from its first station, including for overnight journeys.</p>
+            <div id="train-results" aria-live="polite"></div>
+          </section>
           <div class="activity-layout">
             <section class="panel form-panel">
               <span class="small-label">A JOURNEY, WITHOUT THE RUSH</span>

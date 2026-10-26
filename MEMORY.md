@@ -12,6 +12,7 @@ Last updated: 26 October 2026, Asia/Kolkata.
 - Current website placement: Cloud Run plus private Cloud Storage visitor snapshots. ADR-002 supersedes the VM recommendation for the immediate website; a continuous WhatsApp worker may need a different placement later.
 - Canonical GitHub repository: `https://github.com/anirbanhere/Saathi_Home_Agent`, explicitly selected by the user; its existing visibility is public. The earlier `anirbanbiswas91/home-agents` repository is historical. The user requested agent context/handoff/skills files and AI-assisted maintenance. Keep the original repository intact unless asked to remove it.
 - The Sites edition is an earlier browser-local offline demo; the GCP backend is a separate deployment.
-- WhatsApp route/eligibility, open-weight speech deployment, live train/booking/payment providers, and actual Hermes integration remain unverified or unconnected unless newer handoff evidence says otherwise.
+- Railway provider: RailRadar, with a separate secret-managed API key. Direct train lookup works independently of the LLM; local development retains explicitly selected fixtures. Provider reports require freshness/source checks and are not guaranteed GPS positions. Real provider verification succeeded for a running train and a completed/stale report; consult HANDOFF.md for production deployment evidence.
+- WhatsApp route/eligibility, open-weight speech deployment, live booking/payment providers, and actual Hermes integration remain unverified or unconnected unless newer handoff evidence says otherwise.
 
 Only store non-sensitive, durable project facts here. See `HANDOFF.md` for changing work state and docs/decisions for architectural rationale.

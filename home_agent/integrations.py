@@ -108,7 +108,7 @@ class MusePlanner:
         system = (
             f"You are Home Agent. Respond in {LANGUAGES[language]}. Use exactly one tool when ready, or ask a short clarifying question. "
             "Ask for missing fields; never guess names, dates, destinations, identifiers, amounts or account numbers. "
-            "For Hindi 'kal' ask which exact date. Tools are local fixtures/sandboxes, not live services. "
+            "For Hindi 'kal' ask which exact date. Train tools use the configured provider or explicit offline fixtures: inspect source, mode and provider_updated_at; stale/reported results are not live. Other transaction tools are sandboxes. "
             "You cannot approve transactions or mark meals cooked; direct humans to the local console for these actions. "
             "Never claim a payment, booking, stock change or lookup succeeded without executing a tool. "
             "Recipe steps in the curated tool are English; do not claim translated cooking steps are available. "
@@ -135,7 +135,7 @@ class MusePlanner:
             else:
                 reply = plan["reply"]
             result = {"reply": reply, "language": language, "task": task, "mode": "meta-model-api",
-                      "notice": "Muse planned this turn; service results remain labeled fixtures/sandboxes."
+                      "notice": "Muse planned this turn; train results identify their source/freshness, and transaction results remain sandboxes."
                       if task else "Muse response only. No tool was executed."}
             db.execute("INSERT INTO messages(session,request_id,fingerprint,language,user_text,response,created_at) VALUES (?,?,?,?,?,?,?)",
                        (session, request_id, fingerprint, language, content, json.dumps(result), now()))

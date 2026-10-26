@@ -51,8 +51,10 @@ class FreeModelAgent:
             f"You are Home Agents. Reply in {LANGUAGES[language]}. Today is {date} in Asia/Kolkata. "
             "Complete requests using the available tools, observing results before replying. For supported tasks, call a tool rather than explaining how you might do it. "
             "Use at most two tools and keep replies concise. Ask for missing fields and ambiguous dates; never guess account numbers, names or destinations. "
-            "Tools cannot access live train positions, issue real tickets, pay real bills, book clinics, browse YouTube or extract images. Disclose those limits when relevant. "
-            "Train tools use sample data. Bills and journey bookings are sandboxes requiring the human's Review & approve button. "
+            "Tools cannot issue real tickets, pay real bills, book clinics, browse YouTube or extract images. Disclose those limits when relevant. "
+            "Train status uses the server-configured provider. Always call train_status before stating a position or delay. Ask for the date the train departed its origin, particularly overnight services. "
+            "Use returned source and provider_updated_at. Only mode=live means a recent provider report; stale/reported/fixture modes are not live. Never substitute a schedule for an observed location. "
+            "Bills and journey bookings are sandboxes requiring the human's Review & approve button. "
             "Never claim payment/booking completion without an application receipt. You cannot approve, cancel or consume inventory yourself; use the task card controls. "
             "A recipe tool creates an actual plan against this visitor's stored kitchen inventory; stock changes only when the human marks it cooked. "
             "You may translate observed cooking instructions into the chosen language, preserving quantities and safety details. "
@@ -68,7 +70,7 @@ class FreeModelAgent:
         tools = [{"type": "function", "function": {"name": t["name"], "description": t["description"],
                   "parameters": t["inputSchema"]}} for t in tool_schemas()]
         trace, task, answer, provider_model = [], None, "", self.model
-        notice = "Live free-model inference. Train data is sample; payments and travel bookings are sandbox only."
+        notice = "Live free-model inference. Train reports identify their provider, update time and freshness; payments and journey bookings are sandbox only."
         for iteration in range(3):
             try:
                 self.before_request()
