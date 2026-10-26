@@ -8,3 +8,5 @@ data/
 artifacts/
 *.sqlite3*
 .pytest_cache/
+# Sites maintains this separate source checkout in its own managed repository.
+sites/
