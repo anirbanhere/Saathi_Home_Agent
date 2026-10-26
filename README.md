@@ -1,6 +1,16 @@
 # Home Agent
 
-A runnable local hackathon prototype for everyday tasks, kitchen inventory, and cooking. Agent 3 is the main interaction: text requests, clarification, sandbox transaction review, and persisted outcomes in Tamil, Malayalam, Kannada, Hindi, or English.
+Current product design: [WhatsApp voice and interchangeable models on GCP](docs/home-agents-redesign.md), with an [ordered delivery plan](tasks/voice-first-plan.md). These describe the next architecture; the runnable prototype below retains its current behavior.
+
+Public website: **https://home-agents-xswei7prnq-uc.a.run.app**. Deployment project: [`sathi-home-agent` in `us-central1`](docs/gcp-setup.md). See the deployment record for actual tool checks and current free-provider availability.
+
+A household-agent prototype with a hosted Python website and a separate offline local console. The hosted version supports live OpenRouter free-model reasoning, validated tool calls, private per-visitor persistence, kitchen workflows and explicit sandbox approvals. Actual inference depends on provider availability and account guardrails.
+
+## Hosted application and AI-assisted maintenance
+
+See [hosted deployment](docs/hosted-deployment.md) for the website runtime, deployment record, persistence limits and rollback. Hosted dependencies are in `requirements-hosted.txt`; the local console below remains dependency-free. Neither version currently connects WhatsApp, external clinic booking, real payment/ticket providers, or hosted speech.
+
+Coding agents start with [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md). [SOUL.md](SOUL.md) describes product behavior; [MEMORY.md](MEMORY.md) holds stable development decisions. Domain engineering guides live in `skills/*/SKILL.md`, and GitHub CI runs the tests without production credentials. These Markdown files support development context; they are not automatically loaded as runtime personal memory.
 
 ## Run
 

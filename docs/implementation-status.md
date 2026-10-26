@@ -1,5 +1,7 @@
 # Implementation status — 26 October 2026
 
+Hosted update: the Python Cloud Run website, free-model tool loop, visitor isolation, and durable snapshots are documented in [hosted-deployment.md](hosted-deployment.md). The original local prototype evidence below remains valid for that edition. Consult HANDOFF.md for live inference availability and the latest release checks.
+
 ## Working local prototype
 
 | Area | Implemented | Verification |
