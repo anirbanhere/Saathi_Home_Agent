@@ -178,8 +178,8 @@ def _normalize(raw, requested_model, elapsed_ms):
                 if (
                     not isinstance(value, bool)
                     and isinstance(value, (int, float))
+                    and 0 <= value <= 1_000_000_000_000
                     and math.isfinite(value)
-                    and value >= 0
                 ):
                     usage[field] = value
         return CompletionResult(

@@ -152,6 +152,17 @@ class AdapterTests(unittest.TestCase):
                     max_tokens=budget,
                 )
 
+    def test_untrusted_usage_numbers_cannot_break_a_valid_completion(self):
+        for value in [10**1000, float("inf"), float("nan"), -1, True]:
+            with self.subTest(value_type=type(value).__name__):
+                adapter = OpenRouterAdapter(
+                    "synthetic",
+                    "test/model:free",
+                    transport=lambda *args: response(usage={"prompt_tokens": value}),
+                )
+                result = adapter.complete(self.request())
+                self.assertEqual(result.usage, {})
+
     def test_transport_errors_are_sanitized_and_distinguished(self):
         from urllib.error import HTTPError
         from unittest.mock import patch
