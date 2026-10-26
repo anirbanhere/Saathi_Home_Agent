@@ -1,12 +1,14 @@
 import io
 import json
 import tempfile
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 from home_agent.errors import AppError
-from home_agent.integrations import MusePlanner, parse_plan
+from home_agent.integrations import MusePlanner, parse_plan, speech_request
 from home_agent.mcp import dispatch
 from home_agent.service import HomeAgent
 
@@ -65,3 +67,43 @@ class IntegrationTests(unittest.TestCase):
         response = dispatch(self.app, request, "owner")
         self.assertEqual(response["result"]["serverInfo"]["name"], "home-agent")
         self.assertIsNone(dispatch(self.app, {"jsonrpc": "2.0", "method": "notifications/initialized"}, "owner"))
+
+    def test_mcp_stdio_entry_point_works_from_another_directory(self):
+        root = Path(__file__).resolve().parent.parent
+        requests = [
+            {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-03-26"}},
+            {"jsonrpc": "2.0", "method": "notifications/initialized"},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "inventory_list", "arguments": {}}},
+        ]
+        import os
+        env = {**os.environ, "HOME_AGENT_ROLE": "cook", "HOME_AGENT_DB": str(self.path_for_process())}
+        result = subprocess.run([sys.executable, str(root / "run_mcp.py")],
+                                input="\n".join(json.dumps(r) for r in requests) + "\n",
+                                text=True, capture_output=True, encoding="utf-8", cwd=self.temp.name, env=env, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        replies = [json.loads(line) for line in result.stdout.splitlines()]
+        self.assertEqual(len(replies), 2)
+        self.assertEqual(replies[1]["id"], 2)
+        self.assertFalse(replies[1]["result"]["isError"])
+
+    def path_for_process(self):
+        return Path(self.temp.name) / "process.sqlite3"
+
+    def test_speech_requires_configuration(self):
+        with patch.dict("os.environ", {"HOME_AGENT_ASR_URL": ""}):
+            with self.assertRaises(AppError) as error:
+                speech_request("transcribe", {"language": "ta"})
+        self.assertEqual(error.exception.code, "NOT_CONFIGURED")
+
+    def test_speech_validates_untrusted_language_and_audio(self):
+        with patch.dict("os.environ", {"HOME_AGENT_ASR_URL": "http://127.0.0.1:9001/transcribe"}):
+            for payload in [{"language": [], "audio_base64": "eA=="}, {"language": "ta", "audio_base64": "invalid%%%"}]:
+                with self.assertRaises(AppError):
+                    speech_request("transcribe", payload)
+
+    def test_synthesis_rejects_non_audio_provider_output(self):
+        with patch.dict("os.environ", {"HOME_AGENT_TTS_URL": "http://127.0.0.1:9001/synthesize"}):
+            with patch("home_agent.integrations.post_json", return_value={"audio_base64": "eA==", "mime_type": "text/html"}):
+                with self.assertRaises(AppError) as error:
+                    speech_request("synthesize", {"text": "Hello", "language": "ta"})
+        self.assertEqual(error.exception.code, "PROVIDER_ERROR")

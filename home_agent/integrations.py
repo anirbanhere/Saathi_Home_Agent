@@ -80,7 +80,7 @@ class MusePlanner:
         content = text(content, "message", 4000)
         session = text(session, "session", 100)
         request_id = text(request_id or uuid4().hex, "request id", 100)
-        if language not in LANGUAGES:
+        if not isinstance(language, str) or language not in LANGUAGES:
             raise AppError("Unsupported language.")
         fingerprint = hashlib.sha256((content + "\0" + language).encode()).hexdigest()
 
@@ -144,7 +144,7 @@ def speech_request(kind, payload):
     if not endpoint:
         raise AppError(f"Indic speech is not connected. Configure {variable} locally.", 503, "NOT_CONFIGURED")
     language = payload.get("language", "en")
-    if language not in LANGUAGES:
+    if not isinstance(language, str) or language not in LANGUAGES:
         raise AppError("Unsupported speech language.")
     if kind == "transcribe":
         encoded = text(payload.get("audio_base64"), "audio", 7_000_000)
@@ -155,7 +155,7 @@ def speech_request(kind, payload):
         if not 1 <= len(audio) <= 5_000_000:
             raise AppError("Audio must be under 5 MB.")
         mime = payload.get("mime_type", "audio/webm")
-        if mime not in {"audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4"}:
+        if not isinstance(mime, str) or mime not in {"audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4"}:
             raise AppError("Unsupported audio type.")
         data = {"audio_base64": encoded, "mime_type": mime, "language": language}
     else:
@@ -167,7 +167,7 @@ def speech_request(kind, payload):
         encoded = text(result.get("audio_base64"), "synthesized audio", 7_000_000)
         decoded = base64.b64decode(encoded, validate=True)
         mime = result["mime_type"]
-        if mime not in {"audio/wav", "audio/mpeg", "audio/ogg", "audio/webm"} or len(decoded) > 5_000_000:
+        if not isinstance(mime, str) or mime not in {"audio/wav", "audio/mpeg", "audio/ogg", "audio/webm"} or not 0 < len(decoded) <= 5_000_000:
             raise ValueError("Invalid audio")
     except (KeyError, ValueError, TypeError):
         raise AppError("Speech service returned invalid audio.", 502, "PROVIDER_ERROR") from None
