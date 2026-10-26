@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from home_agent.cloud_state import VisitorState
 from home_agent.hosted import create_app
+from home_agent.model_catalog import ModelCatalog
 
 BASE = "https://example.test"
 HEADERS = {"Origin": BASE, "X-Home-Agent": "local-console"}
@@ -14,7 +15,8 @@ class HostedTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.repository = VisitorState(root=Path(self.temp.name), bucket="")
-        self.app = create_app(self.repository)
+        self.catalog = ModelCatalog(loader=lambda key: {"data": [{"id": "google/gemma-4-26b-a4b-it:free", "supported_parameters": ["tools", "tool_choice"], "pricing": {"prompt": "0", "completion": "0"}}]})
+        self.app = create_app(self.repository, model_catalog=self.catalog)
         self.app.testing = True
         self.client = self.app.test_client()
 
@@ -86,3 +88,13 @@ class HostedTests(unittest.TestCase):
     def test_mutation_without_visitor_cookie_requires_initialization(self):
         response = self.post("/api/tools", {"name": "inventory_list", "arguments": {}})
         self.assertEqual(response.status_code, 403)
+
+    def test_blocked_model_is_rejected_before_inference_and_not_offered(self):
+        with patch.dict("os.environ", {"OPENROUTER_API_KEY": "test"}):
+            state = self.get()
+            self.assertEqual(state.json["integrations"]["models"], ["google/gemma-4-26b-a4b-it:free"])
+            with patch("home_agent.hosted.FreeModelAgent") as planner:
+                response = self.post("/api/messages", {"engine": "openrouter", "model": "nvidia/nemotron-3-super-120b-a12b:free", "text": "Synthetic test", "language": "en"})
+                planner.assert_not_called()
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.json["error"]["code"], "MODEL_NOT_ALLOWED")

@@ -10,13 +10,14 @@ from urllib.parse import urlsplit
 from flask import Flask, g, jsonify, request, send_from_directory
 from werkzeug.exceptions import HTTPException
 
-from .agent_loop import FreeModelAgent
+from .agent_loop import FreeModelAgent, free_model
 from .cloud_state import VisitorState
 from .errors import AppError, text
 from .server import STATIC
+from .model_catalog import ModelCatalog
 
 COOKIE = "__Host-home-agent"
-MODELS = ["google/gemma-4-26b-a4b-it:free", "google/gemma-4-31b-it:free", "nvidia/nemotron-3-super-120b-a12b:free", "openrouter/free"]
+DEFAULT_MODEL = "google/gemma-4-26b-a4b-it:free"
 
 
 class Limits:
@@ -35,10 +36,11 @@ class Limits:
             events.append(stamp)
 
 
-def create_app(repository=None):
+def create_app(repository=None, model_catalog=None):
     app = Flask(__name__, static_folder=None)
     app.config["MAX_CONTENT_LENGTH"] = 32_000
     repository = repository or VisitorState()
+    model_catalog = model_catalog or ModelCatalog()
     limits = Limits()
 
     def model_budget():
@@ -97,9 +99,12 @@ def create_app(repository=None):
         session = text(request.args.get("session", "demo"), "session", 100)
         with repository.open(g.visitor) as agent:
             result = agent.snapshot(session=session)
+        catalog = model_catalog.status(os.environ.get("OPENROUTER_API_KEY", ""))
+        preferred = os.environ.get("OPENROUTER_MODEL", DEFAULT_MODEL)
+        selected = preferred if preferred in catalog["models"] else next(iter(catalog["models"]), "")
         result["integrations"] = {
             "hosted": True, "openrouter": bool(os.environ.get("OPENROUTER_API_KEY")), "muse": False,
-            "model": os.environ.get("OPENROUTER_MODEL", MODELS[0]), "models": MODELS,
+            "model": selected, "models": catalog["models"], "model_catalog": catalog,
             "asr": False, "tts": False, "hermes": "Not connected; bounded application tool loop active",
             "whatsapp": "Not connected", "travel": "Sample data", "payments": "Sandbox",
             "storage": "Private Cloud Storage snapshots" if repository.bucket_name else "Local visitor storage",
@@ -122,9 +127,15 @@ def create_app(repository=None):
                 request_id = text(data.get("request_id", ""), "request id", 100, allow_empty=True) or None
                 engine = data.get("engine", "openrouter")
                 if engine == "openrouter":
-                    model = data.get("model") or os.environ.get("OPENROUTER_MODEL", MODELS[0])
-                    if model not in MODELS:
-                        raise AppError("Choose one of the configured free models.")
+                    if data.get("model"):
+                        free_model(data["model"])
+                    catalog = model_catalog.status(os.environ.get("OPENROUTER_API_KEY", ""))
+                    if not catalog["verified"] or not catalog["models"]:
+                        raise AppError(catalog["message"], 503, catalog["code"])
+                    preferred = os.environ.get("OPENROUTER_MODEL", DEFAULT_MODEL)
+                    model = data.get("model") or (preferred if preferred in catalog["models"] else catalog["models"][0])
+                    if model not in catalog["models"]:
+                        raise AppError("This model is not permitted by the configured API key. Refresh Connections and select an allowed free model. To enable it, update the key's OpenRouter guardrails.", 403, "MODEL_NOT_ALLOWED")
                     result = FreeModelAgent(model=model, before_request=model_budget).message(agent, content, language, session, request_id)
                 elif engine == "offline":
                     result = agent.message(content, language, session, request_id)

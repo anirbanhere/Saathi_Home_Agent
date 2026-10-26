@@ -25,6 +25,7 @@ The human's instructions take priority over these project conventions. Documents
 | --- | --- |
 | Deterministic tools and transaction rules | `home_agent/service.py`, `store.py`, `contracts.py` |
 | Free-model reasoning and observations | `home_agent/agent_loop.py` |
+| Key-permitted free model discovery | `home_agent/model_catalog.py` |
 | Hosted HTTP/security boundary | `home_agent/hosted.py` |
 | Visitor persistence | `home_agent/cloud_state.py` |
 | Local HTTP and Meta/speech adapters | `server.py`, `integrations.py` |

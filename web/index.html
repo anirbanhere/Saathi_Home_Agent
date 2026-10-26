@@ -399,11 +399,9 @@ Carrot,250,g</textarea
               </select>
                 <label for="model-select">Free model</label>
                 <select id="model-select">
-                  <option value="google/gemma-4-26b-a4b-it:free">Google Gemma 4 26B · free</option>
-                  <option value="openrouter/free">Automatic · available free model</option>
-                  <option value="google/gemma-4-31b-it:free">Google Gemma 4 31B · free</option>
-                  <option value="nvidia/nemotron-3-super-120b-a12b:free">NVIDIA Nemotron 3 Super · free</option>
+                  <option value="">Checking permitted free models…</option>
                 </select>
+                <p class="field-hint" id="model-access-note">Model access is verified against the server's API key.</p>
               <p class="field-hint" id="engine-hint">
                 The direct Muse adapter tests the same tool contracts. Hermes
                 uses the separate MCP adapter; selecting Muse here does not run

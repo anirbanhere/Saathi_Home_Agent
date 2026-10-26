@@ -464,14 +464,16 @@ function renderActivity() {
 }
 function renderConnections() {
   const data = state.data.integrations;
+  const models = Array.isArray(data.models) ? data.models : [];
+  const catalog = data.model_catalog;
   const list = $("#connections-list");
   list.replaceChildren();
   const rows = [
     [
       "Free AI · OpenRouter",
       "Live reasoning, tool calls and tool observations. Only free models are allowed; availability and quotas vary.",
-      data.openrouter ? "Connected · free models only" : "Not configured",
-      data.openrouter,
+      data.openrouter ? `${models.length} permitted free models` : "Not configured",
+      data.openrouter && models.length > 0,
     ],
     [
       "Meta Muse",
@@ -534,12 +536,28 @@ function renderConnections() {
   }
   $("#engine").querySelector('[value="muse"]').disabled = !data.muse;
   $("#engine").querySelector('[value="openrouter"]').disabled = !data.openrouter;
+  const select = $("#model-select");
+  const previousModel = select.value;
+  select.replaceChildren();
+  for (const identifier of models) {
+    const option = el("option", "", catalog?.names?.[identifier] || identifier);
+    option.value = identifier;
+    select.append(option);
+  }
+  if (!models.length) {
+    const placeholder = el("option", "", "No verified free models available");
+    placeholder.value = "";
+    select.append(placeholder);
+  }
+  select.value = models.includes(previousModel) ? previousModel : (data.model || "");
+  $("#model-access-note").textContent = catalog?.message
+    ? `${catalog.message} Access settings refresh within one minute; reload after saving changes.`
+    : "Free AI is not configured for this application.";
   if (!state.engineInitialized) {
     $("#engine").value = data.openrouter ? "openrouter" : "offline";
-    if ([...$("#model-select").options].some((option) => option.value === data.model)) $("#model-select").value = data.model;
     state.engineInitialized = true;
   }
-  $("#model-select").disabled = $("#engine").value !== "openrouter";
+  select.disabled = $("#engine").value !== "openrouter" || !models.length;
   $("#runtime-label").textContent = data.hosted ? "Live Python app" : "Local prototype";
   $("#workspace-description").textContent = data.hosted ? "Your private demo workspace" : "Local demo workspace";
   $("#storage-label").textContent = data.hosted ? "Saved privately on the server" : "Saved on this computer";
@@ -552,11 +570,11 @@ function renderConnections() {
   $("#speech-note").textContent = data.asr
     ? "Indic endpoint configured"
     : "Speech service not connected";
-  $("#mode-title").textContent = $("#engine").value === "openrouter" ? "Free AI agent connected" :
+  $("#mode-title").textContent = $("#engine").value === "openrouter" ? (models.length ? "Free AI configured" : "Free AI needs model access") :
     $("#engine").value === "muse" ? "Muse selected" : "Offline demo";
   $("#mode-description").textContent =
     $("#engine").value === "openrouter"
-      ? "Live model + executable tools · Saved kitchen state · Sandbox travel & payments"
+      ? (models.length ? "Key-permitted models only · Provider capacity varies · Sandbox travel & payments" : catalog?.message || "No permitted free model is available.")
       : $("#engine").value === "muse"
       ? "Direct Meta API adapter · Sample train data · Sandbox transactions"
       : "Limited phrase matching · Sample train data · Sandbox transactions";
