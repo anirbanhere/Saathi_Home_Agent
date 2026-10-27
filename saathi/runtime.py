@@ -160,6 +160,14 @@ class Runtime:
         return result
 
     async def handle(self, user_id, message: InboundMessage):
+        # The synchronous SQL transaction and bounded mock awaits share a worker
+        # thread, so another request waiting for a row cannot block this event loop.
+        return await asyncio.to_thread(self._handle_in_worker, user_id, message)
+
+    def _handle_in_worker(self, user_id, message):
+        return asyncio.run(self._handle_transaction(user_id, message))
+
+    async def _handle_transaction(self, user_id, message):
         fingerprint = digest(message.model_dump())
         with self.store.transaction(user_id) as c:
             if not c.scalar(select(s.users.c.id).where(s.users.c.id == user_id)):
