@@ -1,3 +1,4 @@
+-c requirements-saathi.lock.txt
 fastapi==0.162.0
 pydantic==2.14.1
 SQLAlchemy==2.0.55

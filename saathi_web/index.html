@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Saathi · Local mock action agent</title><link rel="stylesheet" href="/assets/style.css"><script src="/assets/app.js" defer></script></head>
+<body>
+<a href="#main" class="skip">Skip to task</a>
+<header><span class="wordmark">saathi<span>Speak naturally. Get things done.</span></span><span class="tag">LOCAL MOCK · PHASE 1</span></header>
+<main id="main">
+  <p class="eyebrow">A LITTLE HELP WITH YOUR EVERYDAY</p><h1>One appointment.<br>A clear next step.</h1>
+  <p class="intro">Try the dental-booking workflow with a clinic we simulate. Review every detail before confirming.</p>
+  <aside class="notice">No real clinic, WhatsApp, payment or notification is connected. Voice fixtures and optional audio replies are synthetic tones mapped to test text; they do not demonstrate speech recognition or spoken replies.</aside>
+  <section id="session-panel" class="panel"><h2>Start a private local demo</h2><p>Use synthetic details only. This creates an anonymous mock user on this computer, with no household sharing.</p><button id="start" type="button">Start local mock session</button></section>
+  <section id="workspace" hidden>
+    <form id="message-form" class="panel">
+      <label for="locale">Request language</label><select id="locale"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option><option value="ta-IN">தமிழ்</option></select>
+      <label for="message">Your appointment request</label><textarea id="message" required maxlength="2000" rows="3">Book dental cleaning in Chennai tomorrow morning</textarea>
+      <div class="actions"><button type="submit">Find mock appointments</button><button id="voice" class="secondary" type="button">Try language audio fixture</button></div>
+      <p class="hint">Text supports the limited mock dental flow, including “tomorrow”, “Saturday” or an exact YYYY-MM-DD. The fixture uses Saturday. Audio is not recorded.</p>
+    </form>
+    <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <section id="result" class="panel" tabindex="-1" aria-label="Current mock task" hidden></section>
+    <section class="panel"><div class="section-head"><h2>Saved tasks</h2><button id="refresh" type="button" class="secondary">Refresh history</button></div><div id="history"></div></section>
+    <details class="panel"><summary>Configured provider roles · all mocked</summary><pre id="profiles"></pre></details>
+  </section>
+</main><footer>Saathi reference implementation · explicit mocks, reviewable actions.</footer>
+</body></html>

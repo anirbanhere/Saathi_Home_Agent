@@ -223,3 +223,25 @@ def test_raw_approval_nonce_is_not_persisted_and_tampered_preview_cannot_commit(
     with pytest.raises(DomainError, match="Preview changed"):
         approve(runtime, user, task)
     assert count(runtime, schema.operations) == 0
+
+
+@pytest.mark.parametrize("role", ["reasoning", "conversation", "stt", "tts"])
+def test_role_swap_preserves_entire_mock_voice_booking_semantics(world, role):
+    runtime, user = world
+    setattr(runtime.settings, role, Profile(provider="mock_alt", model="alternate-v1"))
+    task = run(
+        runtime.handle(
+            user,
+            InboundMessage(
+                external_id=role,
+                locale="en-IN",
+                audio_base64=base64.b64encode(fixture_audio("en-IN")).decode(),
+            ),
+        )
+    )
+    prepared = runtime.preview(
+        user, task["id"], task["payload"]["slots"][0]["id"], task["version"]
+    )
+    completed = approve(runtime, user, prepared)
+    assert completed["status"] == "COMPLETED" and count(runtime, schema.operations) == 1
+    assert completed["profiles"][role]["provider"] == "mock_alt"

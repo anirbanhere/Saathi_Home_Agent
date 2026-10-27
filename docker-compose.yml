@@ -1,4 +1,19 @@
 services:
+  app:
+    profiles: [demo]
+    build:
+      context: .
+      dockerfile: Saathi.Dockerfile
+    environment:
+      SAATHI_DATABASE_URL: postgresql+psycopg://saathi:local-demo-only@postgres:5432/saathi
+      SAATHI_REDIS_URL: redis://redis:6379/0
+      WHATSAPP_PRODUCTION_ELIGIBLE: 'false'
+      SAATHI_LIVE_ACTIONS_ENABLED: 'false'
+      SAATHI_LIVE_SPEECH_ENABLED: 'false'
+    ports: ["127.0.0.1:8781:8781"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
   postgres:
     image: postgres:16-alpine
     environment:
