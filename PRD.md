@@ -1,11 +1,11 @@
 # Project Saathi — Product Requirements Document (PRD)
 
-> **Codex project initiation specification**  
-> **Version:** 1.0 · **Status:** Ready for technical discovery and implementation planning  
-> **Prepared:** 27 October 2026 · **Primary market:** India  
-> **Product:** Saathi — a voice-first, multilingual personal action agent for Indian families  
-> **Primary intended channel:** WhatsApp, **subject to Meta platform eligibility and written/authoritative policy validation**  
-> **Other supported entry points:** local development console, lightweight web chat, optional other approved messaging channels  
+> **Codex project initiation specification**
+> **Version:** 1.0 · **Status:** Ready for technical discovery and implementation planning
+> **Prepared:** 27 October 2026 · **Primary market:** India
+> **Product:** Saathi — a voice-first, multilingual personal action agent for Indian families
+> **Primary intended channel:** WhatsApp, **subject to Meta platform eligibility and written/authoritative policy validation**
+> **Other supported entry points:** local development console, lightweight web chat, optional other approved messaging channels
 > **Original input:** *Project Saathi — A personal AI agent for Indian families on WhatsApp* (uploaded concept document)
 
 ---

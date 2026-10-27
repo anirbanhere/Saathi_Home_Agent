@@ -9,6 +9,7 @@ from typing import Literal
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
+from starlette.exceptions import HTTPException
 from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 from .config import Settings
@@ -19,10 +20,19 @@ from .runtime import Runtime, DomainError
 from .providers import ProviderRouter
 from .speech import fixture_audio
 from .registry import ToolRegistry, MockAppointmentTool
+from .http_limits import BodyLimit
+from .observability import configure_logging
 from pydantic import Field
 import base64
 
 WEB = Path(__file__).resolve().parents[1] / "saathi_web"
+SECURITY_HEADERS = {
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; media-src 'self' data:; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+}
 
 
 class NewSession(Contract):
@@ -45,18 +55,22 @@ class Decision(Version):
 
 
 def create_app(settings=None, store=None):
+    configure_logging()
     settings = settings or Settings.load()
     store = store or Store(settings.database_url)
     runtime = Runtime(store, settings)
     app = FastAPI(title="Saathi — local mock reference", docs_url=None, redoc_url=None)
     app.state.runtime = runtime
+    app.add_middleware(BodyLimit)
     registry = ToolRegistry()
     registry.register(MockAppointmentTool(runtime))
     events = deque()
 
     def error(message, code, status):
         return JSONResponse(
-            {"error": {"code": code, "message": message}}, status_code=status
+            {"error": {"code": code, "message": message}},
+            status_code=status,
+            headers=SECURITY_HEADERS,
         )
 
     @app.middleware("http")
@@ -121,6 +135,18 @@ def create_app(settings=None, store=None):
     @app.exception_handler(DomainError)
     async def domain_error(request, exc):
         return error(str(exc), exc.code, exc.status)
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request, exc):
+        return error(
+            (
+                "Request exceeds60KB."
+                if exc.status_code == 413
+                else "Unsupported request or route."
+            ),
+            "PAYLOAD_LIMIT" if exc.status_code == 413 else "HTTP_ERROR",
+            exc.status_code,
+        )
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):

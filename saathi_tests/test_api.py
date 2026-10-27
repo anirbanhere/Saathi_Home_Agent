@@ -116,3 +116,16 @@ def test_api_audio_fixture_to_approval_and_mock_audio_reply(client, locale):
     )
     audio = client.get(f"/api/tasks/{task['id']}/audio").json()
     assert audio["mock"] and audio["mime"] == "audio/wav" and "tone" in audio["notice"]
+
+
+def test_chunked_body_and_content_length_limits_preserve_security_headers(client):
+    response = client.post(
+        "/api/chat/messages", content=iter([b"{" + b" " * 40000, b" " * 30000 + b"}"])
+    )
+    assert response.status_code == 413
+    assert response.json()["error"]["code"] == "PAYLOAD_LIMIT"
+    assert response.headers["x-content-type-options"] == "nosniff"
+    denied = client.post(
+        "/api/chat/messages", json={}, headers={"Origin": "https://evil.example"}
+    )
+    assert denied.headers["x-frame-options"] == "DENY"
