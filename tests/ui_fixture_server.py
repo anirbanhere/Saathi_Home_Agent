@@ -66,4 +66,4 @@ if __name__ == "__main__":
             model_catalog=catalog,
             browser=BrowserClient(transport=observation),
         )
-        app.run(host="127.0.0.1", port=8766, debug=False, use_reloader=False)
+        app.run(host="127.0.0.1", port=8766, debug=False, use_reloader=False, load_dotenv=False)
