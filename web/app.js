@@ -117,6 +117,9 @@ async function api(path, body) {
   return data;
 }
 async function run(action, button) {
+  const hadFocus = button && document.activeElement === button;
+  const card = button?.closest("[data-task-card]");
+  const container = card?.parentElement;
   if (button) button.disabled = true;
   try {
     return await action();
@@ -125,6 +128,13 @@ async function run(action, button) {
     return null;
   } finally {
     if (button) button.disabled = false;
+    if (hadFocus && document.activeElement === document.body) {
+      const replacement = card && Array.from(container.children).find(
+        (node) => node.dataset.taskCard === card.dataset.taskCard,
+      );
+      const control = replacement?.querySelector(`[data-action="${button.dataset.action}"]`);
+      (control || replacement || (button.isConnected ? button : null))?.focus();
+    }
   }
 }
 function setView(name) {
@@ -156,6 +166,19 @@ function renderAll() {
   renderInventory();
   renderActivity();
   renderConnections();
+  // Result panels and history show the same canonical task after every refresh.
+  for (const selector of ["#kitchen-results", "#train-results", "#research-results", "#handoff-results"]) {
+    const container = $(selector);
+    const previous = container.querySelector("[data-task-card]");
+    const task = previous && state.data.tasks.find((item) => item.id === previous.dataset.taskCard);
+    if (!task) continue;
+    const card = taskCard(task);
+    const open = Array.from(previous.querySelectorAll("details")).map((node) => node.open);
+    card.querySelectorAll("details").forEach((node, index) => { node.open = !!open[index]; });
+    container.replaceChildren(card);
+    if (selector === "#research-results" && !researchInFlight.has(task.id))
+      $("#research-progress").textContent = `Research: ${statusNames[task.status] || task.status}.`;
+  }
   const pending = state.data.tasks.filter(
     (task) => task.status === "awaiting_approval",
   );
@@ -258,6 +281,9 @@ function appendMessage(log, role, content, language) {
 }
 function taskCard(task, compact = false) {
   const card = el("article", "task-card" + (compact ? " pending-card" : ""));
+  card.dataset.taskCard = task.id;
+  card.tabIndex = -1;
+  card.setAttribute("aria-label", `${taskNames[task.kind] || task.kind}: ${statusNames[task.status] || task.status}`);
   const head = el("div", "task-head");
   head.append(
     el("span", "task-title", taskNames[task.kind] || task.kind),
@@ -292,11 +318,14 @@ function taskCard(task, compact = false) {
     card.append(el("p", "task-summary", result.summary), el("p", "", result.details));
     const review = el("ol");
     for (const item of result.required_review || []) review.append(el("li", "", item));
-    const link = el("a", "button secondary", "Open provider to continue ↗");
-    link.href = result.destination;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    card.append(review, link);
+    card.append(review);
+    if (task.status === "needs_input") {
+      const link = el("a", "button secondary", "Open provider to continue ↗");
+      link.href = result.destination;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      card.append(link);
+    }
   }
   if (!compact && task.kind === "web_research") {
     card.append(el("p", "small-muted", task.args.goal));
@@ -750,11 +779,8 @@ document.addEventListener("click", async (event) => {
     await run(async () => {
       const path =
         action.dataset.action === "cancel" ? "cancellation" : "completion";
-      const result = await api(`/api/tasks/${task.id}/${path}`, {});
+      await api(`/api/tasks/${task.id}/${path}`, {});
       await refresh();
-      const kitchen = $("#kitchen-results");
-      if (task.kind === "recipe_plan" && kitchen.childElementCount)
-        kitchen.replaceChildren(taskCard(result));
       toast(
         action.dataset.action === "cancel"
           ? "Task cancelled."
@@ -889,14 +915,22 @@ const researchInFlight = new Set();
 async function continueResearch(task) {
   if (researchInFlight.has(task.id)) return;
   researchInFlight.add(task.id);
+  const progress = $("#research-progress");
+  if ($("#research-results").firstElementChild?.dataset.taskCard !== task.id)
+    $("#research-results").replaceChildren(taskCard(task));
   try {
     do {
-      $("#research-results").replaceChildren(el("p", "small-muted", `Working… step ${task.args.version + 1} of 6. Sources will appear below.`));
+      progress.textContent = `Working… step ${task.args.version + 1} of 6. Saved sources remain available below.`;
       const model = $("#model-select").value;
       task = await api(`/api/browser/tasks/${task.id}/steps`, {version: task.args.version, ...(model ? {model} : {})});
       await refresh();
-      $("#research-results").replaceChildren(taskCard(task));
     } while (task.status === "running" && !document.hidden);
+    progress.textContent = task.status === "running"
+      ? "Research paused. Continue from task history when ready."
+      : `Research: ${statusNames[task.status] || task.status}.`;
+  } catch (error) {
+    progress.textContent = `${error.message} Saved progress is available in task history; refresh before retrying.`;
+    throw error;
   } finally {
     researchInFlight.delete(task.id);
   }

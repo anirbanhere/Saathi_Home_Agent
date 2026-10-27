@@ -15,6 +15,8 @@ Use fixtures/clean process environment for the suite. Do not load production key
 
 ## Existing automated coverage map
 
+For reproducible synthetic UI fixtures and actual390/768/1440px research/handoff/keyboard checks, see [QA-02 usability evidence](qa02-usability.md). Launch `python tests/ui_fixture_server.py` for the loopback-only hosted UI harness; it makes no provider calls. This is separate from the97-test automated suite.
+
 | Area | Existing tests | Behaviors to preserve |
 | --- | --- | --- |
 | Domain workflows | `test_workflows.py`, `test_checkout_handoff.py` | Repeat approval/meal/import/correction, stock conservation, role limits, no draft execution |

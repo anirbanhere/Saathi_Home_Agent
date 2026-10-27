@@ -51,7 +51,8 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+.task-card:focus-visible {
   outline: 3px solid #549c84;
   outline-offset: 3px;
 }
