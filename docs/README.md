@@ -7,6 +7,7 @@ Maintained baseline: 26 October 2026, Asia/Kolkata. This documentation pack prep
 | Need | Document |
 | --- | --- |
 | Resume with Claude | [CLAUDE.md](../CLAUDE.md), [continuation prompt](handoff/CLAUDE_START_HERE.md) |
+| Start four parallel developer/agent sessions | [Development initialization](../DEVELOPMENT_START.md), [team workboard](team-workboard.md), [developer handoff template](handoff/DEVELOPER_SESSION_TEMPLATE.md) |
 | Understand what actually exists | [Current state and evidence](current-state.md) |
 | Understand the product | [Product requirements](product-requirements.md) |
 | Understand deployed and target systems | [Architecture](architecture.md), [data/task design](data-and-task-design.md) |

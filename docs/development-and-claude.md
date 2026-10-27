@@ -2,6 +2,8 @@
 
 Use this repository directly; a separate documentation-only repository would split code and context. Root [CLAUDE.md](../CLAUDE.md) is the entry point for Claude Code or a manually loaded Claude project. This pack has not been executed inside Claude; its source paths, commands and links are verified separately.
 
+For four parallel developers, use [DEVELOPMENT_START.md](../DEVELOPMENT_START.md) and the confirmed [team workboard](team-workboard.md) before this general setup. The parallel protocol overrides this page's solo task-selection/root-handoff steps: contributors use one assigned ticket, separate checkout/branch and their own [task handoff](handoff/DEVELOPER_SESSION_TEMPLATE.md); the coordinator integrates and updates shared status.
+
 ## First hour on a new machine
 
 ```powershell

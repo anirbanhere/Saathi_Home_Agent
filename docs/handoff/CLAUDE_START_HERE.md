@@ -2,6 +2,8 @@
 
 Use the existing [repository](https://github.com/anirbanhere/Saathi_Home_Agent). Clone/open it with Claude Code, or provide the relevant files to a Claude chat that can propose patches. Repository access does not automatically grant GCP/provider/account access.
 
+**Parallel team:** use the assignment-specific prompt in [DEVELOPMENT_START.md](../../DEVELOPMENT_START.md) instead of the solo prompt below. Read your confirmed workboard row; write your own task handoff rather than choosing an uncoordinated ticket or editing root status concurrently.
+
 ## Copy this starting prompt
 
 ```text

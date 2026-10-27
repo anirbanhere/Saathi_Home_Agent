@@ -2,12 +2,14 @@
 
 Read [AGENTS.md](AGENTS.md) for repository rules, then [HANDOFF.md](HANDOFF.md) for the latest checkpoint. This file is a small entry point, not a second set of conflicting rules.
 
+For four-developer parallel work, first use [DEVELOPMENT_START.md](DEVELOPMENT_START.md) and your confirmed [workboard assignment](docs/team-workboard.md). Contributors use separate branches/checkouts and ticket-specific handoffs; the coordinator owns root status and integration. Do not auto-select an already owned ticket.
+
 ## Start a session
 
 1. Check Git status and preserve unrelated changes.
 2. Read [current state](docs/current-state.md), then select one ready ticket from [backlog](docs/backlog.md).
 3. Load the ticket's source/tests and only the relevant architecture/design sections.
-4. Implement one useful slice, verify it, update ticket evidence and HANDOFF.md, and commit the coherent change.
+4. Implement one useful slice, verify it and commit the coherent change. Solo/coordinator sessions update HANDOFF.md; parallel contributors update their own task handoff with integration notes.
 
 [Documentation index](docs/README.md) · [Claude setup and workflow](docs/development-and-claude.md) · [copyable continuation prompt](docs/handoff/CLAUDE_START_HERE.md)
 
@@ -44,4 +46,4 @@ Use a virtual environment. The final command launches the separate loopback prot
 
 ## Finish a session
 
-Report what changed, what was verified, what remains uncertain and the next ready ticket. Update [HANDOFF.md](HANDOFF.md); keep stable choices in [MEMORY.md](MEMORY.md). A plan, mocked response or declared model capability is not live acceptance evidence.
+Report what changed, what was verified, what remains uncertain and the next ready ticket. Update [HANDOFF.md](HANDOFF.md), or your task-specific handoff in parallel contributor mode; the coordinator summarizes stable choices in [MEMORY.md](MEMORY.md). A plan, mocked response or declared model capability is not live acceptance evidence.

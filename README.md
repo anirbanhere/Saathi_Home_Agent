@@ -8,6 +8,8 @@ Source: [anirbanhere/Saathi_Home_Agent](https://github.com/anirbanhere/Saathi_Ho
 
 ## Continue with Claude or another coding agent
 
+For four developers working in parallel, start with [DEVELOPMENT_START.md](DEVELOPMENT_START.md): copyable startup prompt, separate branches, proposed work allocation, review rules and [coordination workboard](docs/team-workboard.md).
+
 Start with [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md) and [HANDOFF.md](HANDOFF.md). The [copyable Claude prompt](docs/handoff/CLAUDE_START_HERE.md) selects a concrete next task. The [documentation index](docs/README.md) maps architecture, API/data design, model/Hermes integration, voice/WhatsApp, security, testing and cloud operations.
 
 [MEMORY.md](MEMORY.md) holds stable development choices; [SOUL.md](SOUL.md) describes intended product behavior. These files are engineering context, not automatic runtime personal memory or tool permissions. The human skipped Nous setup/model testing; it is not a required onboarding step.

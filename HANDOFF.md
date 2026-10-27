@@ -4,7 +4,16 @@ Updated: 27 October 2026, Asia/Kolkata. Branch: `codex/home-agent-demo`. Runtime
 
 ## Latest human objective
 
-Continue development from the documented roadmap. QA-02 research/handoff usability was selected, verified in a real browser, fixed and deployed. No new provider/key, paid inference, account pairing, messages or transactions were introduced.
+Provide initialization/review instructions for four other developers working with Claude in parallel. Completed the shared onboarding guide, proposed workboard, copyable assignment-specific prompt and developer handoff template. No developer assignments, collaborator access, branch protection, PR messages or cloud resources were created. Prior QA-02 runtime release below is unchanged.
+
+## Parallel development onboarding
+
+- Start/share [DEVELOPMENT_START.md](DEVELOPMENT_START.md). Coordinator is the project owner unless the humans designate someone else; four suggested lanes are proposals with no active reservations.
+- Coordinator fills/accepts [team workboard](docs/team-workboard.md): human owner, exact slice, branch/base, allowed paths, reviewer and dependencies. Separate checkout/environment/branch per developer; feature PRs and serial integration.
+- Contributor sessions use [developer handoff template](docs/handoff/DEVELOPER_SESSION_TEMPLATE.md) at `docs/handoff/<dev-id>-<ticket>.md`; coordinator updates root HANDOFF/MEMORY/workboard/aggregate status. AGENTS/CLAUDE/Copilot/PR template and documentation entry points now agree with this parallel-session exception.
+- Guide includes setup commands, current capability boundaries, proposed speech/channel/storage/rehearsal lanes, interface ownership/merge order, reviewer warning signs, evidence requirements and release rules. Markdown claims are not locks; recommended GitHub protection/access settings are not configured by this change.
+- Documentation verification: changed Markdown relative links and explicit existing paths checked; whitespace/private-content/credential scans performed before publishing. No runtime code or deployment change; no new execution of the97-test suite is needed for these documentation-only edits. GitHub synchronization is recorded in the documentation commit/history.
+- Next human coordination step: name four owners/reviewers, confirm lane/path allocations and decide repository access/protection. Each developer can then use the copyable prompt. No cloud/provider credential is needed for ordinary synthetic development.
 
 ## Entry points
 
