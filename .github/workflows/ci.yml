@@ -63,3 +63,8 @@ jobs:
       - run: python -m pytest saathi_tests -q
       - run: node --check saathi_web/app.js
       - run: python -m compileall -q saathi
+      - run: docker build -f Saathi.Dockerfile -t saathi-phase1-ci .
+      - run: docker run -d --name saathi-phase1-ci --publish 127.0.0.1:8781:8781 saathi-phase1-ci
+      - run: curl --fail --retry 15 --retry-connrefused --retry-delay 1 http://127.0.0.1:8781/health/ready
+      - if: always()
+        run: docker rm -f saathi-phase1-ci || true
