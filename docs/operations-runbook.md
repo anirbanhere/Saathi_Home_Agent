@@ -9,8 +9,8 @@ Status: current resource inventory plus procedures. Baseline resource evidence u
 | Project / number / region | `sathi-home-agent` / `59012364414` / `us-central1` |
 | Public service | `home-agents`, [website](https://home-agents-xswei7prnq-uc.a.run.app/) |
 | Public runtime identity | `home-agents-runtime@sathi-home-agent.iam.gserviceaccount.com` |
-| Public revision / image build | `home-agents-00009-xhz` / `3c7a6caf-5c61-4ee5-ae81-421b412816d6` |
-| Previous website rollback revision | `home-agents-00008-hq7` |
+| Public revision / image build | `home-agents-00010-w5z` / `db1242d9-a0cd-42de-8102-a6c22607bb73` |
+| Previous website rollback revision | `home-agents-00009-xhz` |
 | Private browser service | `home-agents-browser`, `https://home-agents-browser-59012364414.us-central1.run.app` |
 | Browser runtime identity | `home-agents-browser@sathi-home-agent.iam.gserviceaccount.com` |
 | Browser revision / build | `home-agents-browser-00001-w2m` / `0604bf8b-5c08-4f48-84d5-a2b4d8f5f07f` |
@@ -99,7 +99,7 @@ The existing worker must remain IAM protected. If creating/recreating it under s
 Rollback a website code release by routing traffic to a **verified existing** prior revision, after checking compatibility:
 
 ```powershell
-gcloud run services update-traffic home-agents --project=sathi-home-agent --region=us-central1 --to-revisions=home-agents-00008-hq7=100
+gcloud run services update-traffic home-agents --project=sathi-home-agent --region=us-central1 --to-revisions=home-agents-00009-xhz=100
 ```
 
 Do not overwrite newer snapshots as part of code rollback. The first malformed-env revision is not a recovery target. Future schema/operation changes require their own compatible migration/rollback plan; never roll back a financial ledger by restoring an old workspace blindly.

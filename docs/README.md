@@ -15,7 +15,7 @@ Maintained baseline: 26 October 2026, Asia/Kolkata. This documentation pack prep
 | Build voice/channel capability | [Voice and WhatsApp plan](voice-and-whatsapp-plan.md) |
 | Choose the next work | [Roadmap](roadmap.md), [sprint plan](sprint-plan.md), [implementable backlog](backlog.md) |
 | Run and change the app | [Development and Claude workflow](development-and-claude.md) |
-| Verify a feature | [Testing and evaluation](testing-and-evaluation.md) |
+| Verify a feature | [Testing and evaluation](testing-and-evaluation.md), [research/handoff UI evidence](qa02-usability.md) |
 | Operate GCP and recover | [Operations runbook](operations-runbook.md) |
 | Assess boundaries and unknowns | [Security/privacy](security-and-privacy.md), [risks/decisions](risks-and-decisions.md) |
 | Maintain execution context | [HANDOFF.md](../HANDOFF.md), [MEMORY.md](../MEMORY.md), [work templates](templates/task.md) |

@@ -54,7 +54,7 @@ Run documented checks in an isolated environment, map actual hosted/local/static
 
 ### QA-02 — Verify research and handoff usability
 
-**P0 · S · Implemented and locally browser-verified (27 October) · Depends:** current web UI; selected changes under test. See [QA-02 evidence](qa02-usability.md); deployment evidence is in HANDOFF.md. Full accessibility certification and successful live LLM research remain unclaimed.
+**P0 · S · Implemented, deployed and browser-verified (27 October) · Depends:** current web UI; selected changes under test. See [QA-02 evidence](qa02-usability.md); deployment evidence is in HANDOFF.md. Full accessibility certification and successful live LLM research remain unclaimed.
 
 Use a real browser for start/progress/resume/cancel, source expansion, provider outage, draft discard and keyboard flows. Test a 390px device/viewport if supported, plus tablet/desktop. Files: `web/`, browser/API tests.
 

@@ -1,6 +1,6 @@
 # Current state and evidence
 
-Baseline inspected: source commit `f72913f`, 27 October 2026; earlier release evidence is preserved below. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.
+Baseline inspected: source commit `08d0bbe`, 27 October 2026; earlier release evidence is preserved below. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.
 
 ## Running editions
 
@@ -20,7 +20,7 @@ Public app: [Home Agents](https://home-agents-xswei7prnq-uc.a.run.app/). Source:
 | Shared completion adapters / observed availability | Implemented/deployed | `model_adapters.py`, `model_health.py`, [adapter notes](model-adapters.md) | Meta uses contract tests only; request availability is process-local and not task success |
 | Key-permitted model selector | Implemented/deployed | `model_catalog.py`, `test_model_catalog.py` | Catalogue permission is not provider availability; last permitted choice was Gemma 4 26B free |
 | Public page inspection | Live verified | `browser_worker.py`, public website→worker checks | Public HTTPS/read profile; some sites deny access |
-| Research progress/resume/cancel | Implemented/deployed | `research.py`, research/hosted tests | Browser client drives requests; no unattended background progress |
+| Research progress/resume/cancel | Implemented/deployed | `research.py`, research/hosted tests, [UI verification](qa02-usability.md) | Browser client drives requests; no unattended background progress. Result cards synchronize on refresh; saved result sources stay visible during steps |
 | AI browser reasoning/quoted answer | Implemented, mocked tests pass | `research.py` | Successful live model→browser→answer acceptance pending capacity |
 | Train running reports | Live verified | `trains.py`, `live-trains.md` | Third-party reports, not guaranteed GPS; freshness labels essential |
 | Bill and journey booking | Sandbox only | `service.py`, workflow tests | No money moved, no ticket issued |

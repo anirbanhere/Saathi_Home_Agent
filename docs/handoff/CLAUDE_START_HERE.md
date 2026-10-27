@@ -14,7 +14,9 @@ as the authority for implemented behavior, and mark proposals separately.
 Choose the next ready ticket from the latest HANDOFF.md. As of 27 October,
 MODEL-01 was checked and remains capacity-blocked; MODEL-02's shared completion
 seam and MODEL-03's request observations are implemented. Prefer an independent
-QA-02 or bounded VOICE-01 slice rather than repeat the same blocked request.
+bounded VOICE-01 slice or OPS-01 rehearsal rather than repeat the same blocked
+request. QA-02 usability fixes and browser evidence are now recorded in
+docs/qa02-usability.md; do not repeat that completed slice.
 Inspect existing source/tests first. Do not require a new provider, paid
 inference or weakened guardrails. Nous setup/testing was explicitly skipped.
 
