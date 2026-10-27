@@ -1,5 +1,7 @@
 # Implementable development backlog
 
+**Supersession note,28 October2026:** root PRD.md is the new product brief. Its Section14 Phase0/1 execution and proposed Phase2 PRs are tracked in [the implementation report](saathi-phase01-report.md), [current plan](../tasks/saathi-phase01.md) and HANDOFF.md. Tickets below retain historical/future context; do not use their old priority/dependency order to override the replacement PRD.
+
 Baseline: 26 October 2026. All tickets are proposed/unstarted unless explicitly marked otherwise. Existing shipped work is in [current state](current-state.md), not re-listed as unfinished. The documentation pack is `DOC-01`; its verification is recorded in HANDOFF.md.
 
 Priorities: **P0** immediate demo/reliability; **P1** foundation or primary voice/task workflow; **P2** household breadth/beta; **P3** optional later integration. Estimates are engineering effort ranges: XS≤half-day, S≈one focused day, M≈two–three days. They exclude provider access, native-language review and other external waiting. Split larger investigations after the first spike. Owner is unassigned until a developer/Claude session claims one ticket in HANDOFF.md.

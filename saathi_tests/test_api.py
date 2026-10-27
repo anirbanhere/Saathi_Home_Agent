@@ -131,18 +131,26 @@ def test_chunked_body_and_content_length_limits_preserve_security_headers(client
     assert denied.headers["x-frame-options"] == "DENY"
 
 
-def test_simultaneous_web_messages_do_not_block_the_model_event_loop(client, monkeypatch):
+def test_simultaneous_web_messages_do_not_block_the_model_event_loop(
+    client, monkeypatch
+):
     import asyncio
     from concurrent.futures import ThreadPoolExecutor
     from saathi.providers import MockModel
+
     original = MockModel.structured_generate
+
     async def delayed(self, request, schema):
-        await asyncio.sleep(.1)
+        await asyncio.sleep(0.1)
         return await original(self, request, schema)
+
     monkeypatch.setattr(MockModel, "structured_generate", delayed)
     message = {"external_id": "concurrent-web", "text": "Book Chennai tomorrow"}
     with ThreadPoolExecutor(max_workers=2) as pool:
-        futures = [pool.submit(client.post, "/api/chat/messages", json=message) for _ in range(2)]
+        futures = [
+            pool.submit(client.post, "/api/chat/messages", json=message)
+            for _ in range(2)
+        ]
         responses = [future.result(timeout=5) for future in futures]
     assert all(response.status_code == 200 for response in responses)
     assert responses[0].json()["id"] == responses[1].json()["id"]

@@ -1,5 +1,9 @@
 # Current state and evidence
 
+## New reference checkpoint —28 October2026
+
+The user replaced the PRD and authorized Section14 Phase0/1. New `saathi/` FastAPI/Pydantic/PostgreSQL-targeted service provides a local, deterministic mock dental workflow with independent model/speech roles, durable approvals/operations/outbox and web/CLI. See [implementation evidence](saathi-phase01-report.md). It has not replaced the public website. Live speech/model/provider acceptance and WhatsApp eligibility remain gated; synthetic audio tones are not an ASR benchmark. The older capability matrix below describes the preserved Home Agents deployment.
+
 Baseline inspected: source commit `08d0bbe`, 27 October 2026; earlier release evidence is preserved below. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.
 
 ## Running editions

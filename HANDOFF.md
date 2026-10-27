@@ -1,60 +1,48 @@
-# Home Agents development handoff
+# Saathi development handoff
 
-Updated: 27 October 2026, Asia/Kolkata. Branch: `codex/home-agent-demo`. Runtime source checkpoint: `08d0bbe`.
+Updated:28 October2026, Asia/Kolkata. Branch: `codex/saathi-phase01`. Runtime source: `cf9bff1` (concurrent HTTP fix); CI/container source included. Later context/report and test-format changes do not change application behavior.
 
-## Latest human objective
+## Human objective and current scope
 
-Provide initialization/review instructions for four other developers working with Claude in parallel. Completed the shared onboarding guide, proposed workboard, copyable assignment-specific prompt and developer handoff template. No developer assignments, collaborator access, branch protection, PR messages or cloud resources were created. Prior QA-02 runtime release below is unchanged.
+The human replaced the prior plan with `Saathi_PRD_Codex.md` and explicitly requested Section14 Phase0/1 kickoff. Root [PRD.md](PRD.md) is the new product requirement; [execution plan](tasks/saathi-phase01.md) and [implementation report/demo commands/Phase2 proposal](docs/saathi-phase01-report.md) track this work. Preserve the existing public Home Agents app; no production migration or new public deployment was performed.
 
-## Parallel development onboarding
+The coordinator session owns this additive implementation. The other four developer slots remain unassigned; old proposed lanes must be re-planned against the new PRD. Contributors still use separate branches/checkouts, confirmed scope and task-specific handoffs. This coordinator maintains root status.
 
-- Start/share [DEVELOPMENT_START.md](DEVELOPMENT_START.md). Coordinator is the project owner unless the humans designate someone else; four suggested lanes are proposals with no active reservations.
-- Coordinator fills/accepts [team workboard](docs/team-workboard.md): human owner, exact slice, branch/base, allowed paths, reviewer and dependencies. Separate checkout/environment/branch per developer; feature PRs and serial integration.
-- Contributor sessions use [developer handoff template](docs/handoff/DEVELOPER_SESSION_TEMPLATE.md) at `docs/handoff/<dev-id>-<ticket>.md`; coordinator updates root HANDOFF/MEMORY/workboard/aggregate status. AGENTS/CLAUDE/Copilot/PR template and documentation entry points now agree with this parallel-session exception.
-- Guide includes setup commands, current capability boundaries, proposed speech/channel/storage/rehearsal lanes, interface ownership/merge order, reviewer warning signs, evidence requirements and release rules. Markdown claims are not locks; recommended GitHub protection/access settings are not configured by this change.
-- Documentation verification: changed Markdown relative links and explicit existing paths checked; whitespace/private-content/credential scans performed before publishing. No runtime code or deployment change; no new execution of the97-test suite is needed for these documentation-only edits. GitHub synchronization is recorded in the documentation commit/history.
-- Next human coordination step: name four owners/reviewers, confirm lane/path allocations and decide repository access/protection. Each developer can then use the copyable prompt. No cloud/provider credential is needed for ordinary synthetic development.
+## Implemented Phase0/1 foundation
 
-## Entry points
+- Separate `saathi/` FastAPI/Pydantic2/SQLAlchemy service, PostgreSQL/Alembic target, Redis readiness, local SQLite mock option; compose and a non-root app container with loopback-only published port. Legacy `home_agent/` is unchanged.
+- Independent typed reasoning/conversation/STT/TTS roles, normalized local web/CLI channels, task-pinned provider profiles, deterministic mock/mock_alt router. Sarvam/ElevenLabs STT/TTS have disabled-live HTTP contract spikes with fixed endpoints and explicit model/voice IDs. Runtime rejects live profiles/flags.
+- SQL users/sessions, conversations/deduplicated message responses, typed task plan/state, canonical preview hashes, scoped one-time approval with hashed nonce/expiry/version, atomic mock slot/operation/outbox, audit and explicit mock delivery drain.
+- Human web controls own review/approve/edit/reject/cancel; no model approval. Duplicate approval returns the same effect, unknown response enters RECONCILIATION_REQUIRED and reconciles saved operation rather than reexecuting. Post-commit cancellation is not falsely claimed.
+- Local UI and CLI exercise text or three generated acoustic-token WAV fixtures → mock dental options → exact review → approval → verified MOCK booking reference → durable reminder intent/mock delivery sink. Fixtures are not spoken recordings or actual ASR/TTS quality evidence.
+- Session ownership, CSRF/origin checks, strict bounded schemas, received-byte limits including chunked bodies and secret-free event logging. Logs label proposed transitions; SQL state/audit after commit proves completion.
+- New architecture/ADR0004/vendor-gate discovery/report; agent/onboarding/root status entry points point to the new PRD and preserve legacy evidence.
 
-[CLAUDE.md](CLAUDE.md) → [documentation index](docs/README.md) → [current state](docs/current-state.md) / [backlog](docs/backlog.md). Current slice: [QA-02 evidence](docs/qa02-usability.md) and [acceptance plan](tasks/qa02-usability-plan.md). Model contracts: [shared adapters/availability](docs/model-adapters.md). Recovery: [operations runbook](docs/operations-runbook.md).
+## Verification and CI
 
-## Current release and rollout
+- Local new-service suite:52 passed, one real PostgreSQL/Redis test skipped because the local Docker Linux daemon is unavailable. The Docker CLI exists; compose configuration validates. No local-container execution is claimed.
+- Legacy97 tests passed after new dependencies were installed; no test/security boundary weakened. New and legacy JS syntax checks and Python compilation passed. New runtime dependency audit:27 resolved/pinned packages, zero known advisories at the recorded check.
+- [Final runtime test CI40563359294](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40563359294), source `c8e061d902c9cdaa3b3bd86d157a0c62a2d18e7f`:52 new tests passed, including actual PostgreSQL16/Redis7 migration/concurrent contention/restart;97 legacy tests passed.
+- Initial container CI40564024264 built the image successfully and passed52+97 tests, but the immediate curl health probe hit connection reset before readiness; it did not retry that error. CI-only fix `1f26ba7` adds bounded all-error startup retries and failed-container log capture. [Repaired container CI40564413284](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40564413284) passed for `1f26ba76bed331e85b8b34116830d204abc68197`:52 new +97 legacy tests, image build and loopback readiness smoke all passed. The smoke uses local SQLite in the container; real PostgreSQL/Redis evidence comes from the separate integration test.
+- Actual CLI smoke: separate fresh synthetic DB per en-IN/hi-IN/ta-IN audio-fixture scenario; all completed with mock booking/delivery references; Tamil exercised simulated response loss and reconciliation.
+- Actual local Chromium: text request, exact review/approve, persisted completed task after reload, Tamil fixture/native-script reply, pending-preview reload without a recoverable raw nonce, fresh slot reselect/new review and mock completion. Actual390px client/scroll390/390, desktop1440px client/scroll1425/1425; no console warnings/errors observed. No real clinic, external message or provider account used.
 
-Public URL: `https://home-agents-xswei7prnq-uc.a.run.app`. Canonical public repository: `https://github.com/anirbanhere/Saathi_Home_Agent`; preserve `previous-origin` and visibility.
+- Final review reproduced simultaneous HTTP requests blocking the model event loop while synchronous SQL held a lock. Added a delayed-model concurrent-duplicate regression; it failed before the fix, then passed in about1s. Each bounded mock turn now runs in a separate worker thread/event loop; SQL remains authoritative. Do not extend this mock transaction to slow real-provider IO without the Phase2 durable execution design. [Final implementation CI40565249140](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40565249140) passed for `cf9bff155c0e55ee35f2e8ac3cceb3631a0c6606`:53 new +97 legacy tests, real PostgreSQL/Redis integration, container build and health smoke. Local preview was restarted on final source at127.0.0.1:8781 using ignored synthetic `artifacts/saathi-web-review.sqlite3`; readiness returned mock/SQLite.
 
-- Current ready website: **home-agents-00010-w5z**, image build **db1242d9-a0cd-42de-8102-a6c22607bb73**, 100 percent traffic. Runtime source `08d0bbebb5df0e83c7182d62821cecdeca7f2dd5`.
-- Previous verified rollback: **home-agents-00009-xhz**, build `3c7a6caf-5c61-4ee5-ae81-421b412816d6`. No schema migration; code rollback must preserve newer snapshots.
-- Private browser unchanged: `home-agents-browser-00001-w2m`, build `0604bf8b-5c08-4f48-84d5-a2b4d8f5f07f`. Dedicated identity, private invocation, no provider secrets/project-data roles.
-- Both provider secret references, literal environment values and website runtime identity were inspected/preserved. No secret payload was retrieved. Upload manifest selected33 runtime files; separate pre-build scan found no private paths/credential matches. Tests/QA harness/docs remain excluded from cloud source.
+## Current limits and launch gates
 
-## What changed
+This is a completed deterministic mock foundation, not the PRD's live-provider MVP. Real Hindi/Tamil/English speech recognition/synthesis, arbitrary-goal/model reasoning, real booking/calendar providers, remote MCP/OAuth, durable background scheduler/delivery, verified household/consumer accounts, public media/retention/export/deletion and production operational limits remain unverified/unimplemented for this new service. The report lists acceptance gaps per phase deliverable; do not turn mock test counts into language-quality or fulfillment claims.
 
-- Reproduced a real UI defect: discarding a draft updated history but left its result card actionable and dropped focus to BODY.
-- Existing result panels now synchronize their displayed task with refreshed canonical state. Result-panel open source/details disclosures are preserved. Cancelled drafts lose their provider continuation links.
-- Task actions restore keyboard focus to the refreshed control or named task card when their trigger disappears; surviving focus elsewhere is not deliberately moved. Task cards have a visible focus outline and accessible name/status.
-- Research has a separate atomic live progress line. Saved sources remain rendered during the next step; recoverable transport failures have inline guidance. Cancellation updates the status line. No additional polling/probes or external permissions.
-- Added `tests/ui_fixture_server.py`: loopback-only temporary synthetic hosted state, page/blocked-page observations and deliberate model failures; no provider requests. Run `python tests/ui_fixture_server.py`, open `http://127.0.0.1:8766` in a fresh context. It is reproducible manual QA data, not a new automated browser suite. Test server was stopped after verification.
+WHATSAPP_PRODUCTION_ELIGIBLE=false; live speech/actions also default false and are rejected if enabled in this release. Current terms URL redirected to blocked login during discovery; PRD country-exception details were not independently re-confirmed. Authoritative offering-specific review and test-account access remain gates. No unofficial bridge, new WhatsApp account, message, real call, purchase/payment or IRCTC action was attempted. Nous setup stays skipped.
 
-## Verification
+No secret payload is published or logged. Ordinary new tests use injected transports and fresh synthetic state. Pending approval after reload must issue a fresh nonce/review; raw nonce is never persisted. Local identity/cookies are not verified family identity. PostgreSQL is the target; SQLite success is not PostgreSQL concurrency evidence. Redis is currently a readiness dependency, not the task ledger or implemented scheduler.
 
-- **97 existing Python tests passed** using fixture provider/blank model and railway keys, authorized loopback sockets and workspace-specific temporary directory. JS syntax, Python compilation and Git whitespace checks passed.
-- [Implementation CI passed](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40458455826) for `08d0bbebb5df0e83c7182d62821cecdeca7f2dd5`. Later documentation-only synchronization does not change the deployed image.
-- Actual local Chromium: save/discard, blocked page Needs details, synthetic model outage with retained source, keyboard source expansion/resume/cancel, reload/history resume and cancelled progress line. Literal script-like source text remained text with zero inserted script nodes. Source links retained `noopener noreferrer`.
-- Actual Activity viewport measurements:390/390/390,768/753/753,1440/1425/1425 (`innerWidth`/document client/document scroll). Emulation can reload, so Activity was selected again before each measurement. Expanded-source mobile screenshot inspected. Latest fixture console had no warnings/errors. This is targeted QA, not a full screen-reader/axe/Core Web Vitals audit.
-- Post-deploy: public health `ok`; fresh synthetic dal plan persisted; public website→private worker inspected Python.org with one source and `succeeded` page-inspection status. No AI summary or transaction was executed. Prior synthetic visitor tasks survived the new revision.
-- Actual deployed390px UI: saved then discarded a new synthetic food draft; result showed Cancelled, zero action buttons/links, focus on named Cancelled article, document width390. No console errors/warnings. No provider checkout was opened.
+## Demo and continuation
 
-## Stable decisions and limits
+Read [the implementation report](docs/saathi-phase01-report.md) for full setup, migration, mock audio/text demo commands and proposed Phase2 PRs. Quick local web: install `requirements-saathi-dev.txt`, then `python -m uvicorn saathi.main:create_app --factory --host 127.0.0.1 --port 8781`. CLI: `python -m saathi.cli demo --approve-mock --voice --locale hi-IN`. Use a fresh task-specific database filename for isolated happy paths; do not wipe prior state. No API keys are required for this mock service.
 
-OpenRouter shared adapters and process-local request observations remain deployed. The last real inference attempt on27 October returned429, with only Gemma4 26B permitted. No new live inference attempt was needed for this UI slice. MODEL-01 successful live tool/research acceptance remains unverified. Do not keep repeating the same blocked request, relax guardrails or substitute paid/fixture inference.
+Before starting more work, fetch the feature branch/PR, inspect its actual head/CI and avoid recreating Phase0/1. Phase2 work is proposed only; obtain a concrete assignment. First gates are verified identity/media and real permissioned speech acceptance; real appointment/channel/scheduler integrations follow their own eligibility/access/reconciliation design. Do not silently overwrite/deploy the legacy app.
 
-The human explicitly skipped Nous setup/model tests; do not request a key or make it a prerequisite unless reopened. Meta has synthetic contract coverage only; actual Hermes/ASR/TTS/WhatsApp/clinic/payment execution remains unconnected.
+## Preserved public legacy release
 
-Anonymous visitor snapshots are not shared family identity or a financial operation ledger. Checkout drafts are unverified/manual; bill/journey approvals remain sandbox. Markdown is engineering context, not runtime personal memory or authorization.
-
-## Next actionable work
-
-QA-02's targeted usability slice is complete; consult its evidence rather than redo it. Choose **VOICE-01**, a bounded, license-verified open-weight speech benchmark using synthetic/permissioned audio and existing resource constraints; record actual transcript/output/critical-field/latency evidence before promising language quality. Another independent option is **OPS-01**, a controlled rollback rehearsal with state preservation. No unattended GPU provisioning, contacts/messages or real financial actions follows automatically.
-
-MODEL-02's completion seam and MODEL-03's request-observation slice are implemented. Full task/runtime/provider swapping, durable metrics/budgets/backoff, shared identity, media ownership and durable jobs remain future tickets. No pending human input is needed to begin the next bounded investigation.
+URL: `https://home-agents-xswei7prnq-uc.a.run.app`. Website `home-agents-00010-w5z`, build `db1242d9-a0cd-42de-8102-a6c22607bb73`, source `08d0bbe`. Rollback `home-agents-00009-xhz`, build `3c7a6caf-5c61-4ee5-ae81-421b412816d6`. Private browser remains `home-agents-browser-00001-w2m`; production secret references/config/IAM were not changed by this phase. Last real legacy OpenRouter attempt returned429; no new inference retries or paid fallback were introduced. See [prior handoff](docs/history/2026-10-27-pre-saathi-handoff.md) and [operations runbook](docs/operations-runbook.md).

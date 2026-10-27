@@ -15,7 +15,7 @@ flowchart LR
   DB --> O[Explicit mock outbox drain]
   R --> V[Independent TTS role]
   V --> W
-  Q[Redis readiness / wake-up cache] -. optional .-> O
+  Q[Redis readiness - future wake-up adapter] -. future .-> O
 ```
 
 ## Boundaries and persistence

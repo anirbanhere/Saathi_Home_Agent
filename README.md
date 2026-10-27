@@ -1,4 +1,17 @@
-# Home Agents
+# Saathi — reference service and legacy Home Agents demo
+
+**New plan:** [PRD.md](PRD.md) is the governing product brief. Section14 Phase0/1 now has an isolated local mock dental-booking implementation under `saathi/`. Start with the [implementation report and run commands](docs/saathi-phase01-report.md), [architecture](docs/architecture.md) and [current handoff](HANDOFF.md). No new public deployment, real speech recognition, WhatsApp launch or genuine appointment is claimed.
+
+```text
+python -m pip install -r requirements-saathi-dev.txt
+python -m uvicorn saathi.main:create_app --factory --host 127.0.0.1 --port 8781
+python -m saathi.cli demo --approve-mock --voice --locale hi-IN
+python -m pytest saathi_tests -q
+```
+
+Use Python3.12 in an isolated environment. The CLI command explicitly consents to a scripted **mock** booking and uses a synthetic audio tone, not a speech recording. See the report for clean synthetic databases, separate role selection, PostgreSQL/Redis compose and the Phase2 breakdown.
+
+## Existing public demo — preserved legacy edition
 
 A household assistant for everyday tasks, cooking and inventory, with Tamil, Malayalam, Kannada, Hindi and English as target languages. The current executable product is a public Python website; WhatsApp voice is the intended primary interface as development continues.
 

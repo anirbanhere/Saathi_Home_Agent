@@ -1,6 +1,8 @@
-# Home Agents: instructions for coding agents
+# Saathi and legacy Home Agents: instructions for coding agents
 
 ## Start with the smallest useful context
+
+Current product requirements are `PRD.md`, adopted from the human's replacement PRD. Section14 authorizes Phase0/1 only. Read `docs/saathi-phase01-report.md` and `tasks/saathi-phase01.md` for new-service scope; prior roadmap/ticket order is superseded where it conflicts. Preserve the still-deployed legacy website while the new local reference is reviewed.
 
 1. Read `HANDOFF.md` for current status, active work, evidence, and outstanding blockers.
 2. Read `MEMORY.md` for stable product decisions and `SOUL.md` for intended assistant behavior.
@@ -18,7 +20,9 @@ Contributors work through authorized feature-branch PRs; they do not push to `ma
 
 ## Product and runtime boundaries
 
-- Product: Home Agents; Tamil, Malayalam, Kannada, Hindi, and English; WhatsApp voice is the long-term primary interface. A working public web app is the immediate priority.
+- New reference product: Saathi; Phase1 local mock dental flow in English/Hindi/Tamil, independent model/STT/TTS/channel contracts. Malayalam evaluation is later; Kannada is a deferred earlier target. `saathi/` is FastAPI/Pydantic/SQLAlchemy, with PostgreSQL/Alembic and Redis compose/CI; SQLite is local mock/test mode. See the new PRD/report instead of rebuilding completed slices.
+- Legacy product/deployment: Home Agents, with Tamil/Malayalam/Kannada/Hindi/English target UI and existing kitchen/train/public-browser tools. It remains a separate Flask/GCS runtime and is not migrated/redeployed by the new local service.
+- Phase1 real speech/actions and public WhatsApp stay disabled. Runtime flags cannot grant live execution. Mock audio is synthetic tone lookup, not ASR; mock TTS is a tone. Never present mock clinic references or mock delivery receipts as real appointments/notifications. No unofficial WhatsApp bridge is a launch workaround; authoritative eligibility/access remains a gate.
 - Hosted runtime: `home_agent/hosted.py`, `cloud_state.py`, and `agent_loop.py`. The localhost server in `server.py` remains a separate trusted-owner development mode.
 - The hosted agent uses a bounded application tool loop with OpenRouter free models. Do not describe Hermes as connected until a real integration is verified.
 - Model output may propose tool calls. Application code validates them. Human UI controls retain approvals, cancellation, and stock-consumption commits.
@@ -33,6 +37,9 @@ Contributors work through authorized feature-branch PRs; they do not push to `ma
 
 | Area | Files |
 | --- | --- |
+| New Saathi typed roles / speech / channels | `saathi/contracts.py`, `config.py`, `providers.py`, `speech.py`, `vendor_speech.py`, `channels.py` |
+| New Saathi tasks / policy / tools / outbox | `saathi/runtime.py`, `state.py`, `policy.py`, `registry.py`, `outbox.py` |
+| New Saathi HTTP / CLI / schema / tests | `saathi/main.py`, `cli.py`, `db/`, `saathi_web/`, `saathi_tests/` |
 | Deterministic tools and transaction rules | `home_agent/service.py`, `store.py`, `contracts.py` |
 | Free-model reasoning and observations | `home_agent/agent_loop.py` |
 | Shared provider completion contract / request observations | `home_agent/model_adapters.py`, `model_health.py`, `docs/model-adapters.md` |
@@ -50,6 +57,8 @@ Contributors work through authorized feature-branch PRs; they do not push to `ma
 | Tests | `tests/` |
 
 Hosted development: install `requirements-hosted.txt` in an isolated Python environment. Run `python -m unittest discover -s tests -v` and `node --check web/app.js`. Existing HTTP tests require loopback sockets. In a restricted Windows sandbox, run with authorized socket access and a writable task-specific `tempfile.tempdir`; do not weaken tests to hide environment failures.
+
+New Saathi development: install `requirements-saathi-dev.txt`; run `python -m pytest saathi_tests -q`, `node --check saathi_web/app.js` and `python -m compileall -q saathi`. Preserve the legacy suite too. Use `python -m uvicorn saathi.main:create_app --factory --host 127.0.0.1 --port 8781` or `python -m saathi.cli demo --approve-mock`. PostgreSQL/Redis tests are mandatory in the new CI job; local skip is not PostgreSQL proof. `.env` is not loaded automatically. New migrations affect only prefixed Saathi tables; no legacy/public production migration is authorized by running local demos.
 
 Use small, testable changes. Add tests for ownership, duplicates, error recovery, provider boundaries, and persistence when changing those behaviors. Verify browser changes in a real browser. Keep the public demo usable and show incomplete integrations honestly. CI must not require production keys or send household data to external providers.
 
