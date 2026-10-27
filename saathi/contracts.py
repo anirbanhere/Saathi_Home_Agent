@@ -99,11 +99,16 @@ class TaskPlan(Contract):
 
 class ToolManifest(Contract):
     name: str
+    title: str = "Mock dental appointment"
     action: Action
     provider: str = "mock_clinic"
     permission: str = "mock_dental"
     mock: bool = True
     idempotent: bool = True
+    auth_type: str = "scoped_local_mock_principal"
+    data_categories: list[str] = Field(default_factory=lambda: ["mock_appointment"])
+    pricing: str = "No charge; simulation only"
+    risk_level: Literal["read", "consequential"] = "consequential"
     input_schema: dict
     output_schema: dict
 
