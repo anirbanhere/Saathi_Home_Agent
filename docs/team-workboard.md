@@ -34,7 +34,7 @@ Record a timestamp with timezone and PR/head commit at review. Reassignments req
 
 | Order | Ticket / PR / head commit | Prerequisite PRs/contracts | Test/runtime evidence | Review disposition | Merged commit / deployment |
 | --- | --- | --- | --- | --- | --- |
-| — | None queued by this document | — | — | — | — |
+| 1 | PRD Phase0/1 · [PR1](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1) | Replacement PRD Section14; standalone additive reference | Runtime `cf9bff1`:53 new +97 legacy checks, PostgreSQL/Redis and container smoke; see report/HANDOFF | Published for independent review; reviewer not assigned | Not merged or deployed |
 
 ## Coordination rhythm
 

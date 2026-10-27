@@ -6,6 +6,8 @@ Updated:28 October2026, Asia/Kolkata. Branch: `codex/saathi-phase01`. Runtime so
 
 The human replaced the prior plan with `Saathi_PRD_Codex.md` and explicitly requested Section14 Phase0/1 kickoff. Root [PRD.md](PRD.md) is the new product requirement; [execution plan](tasks/saathi-phase01.md) and [implementation report/demo commands/Phase2 proposal](docs/saathi-phase01-report.md) track this work. Preserve the existing public Home Agents app; no production migration or new public deployment was performed.
 
+Review artifact: [PR1 — Saathi Phase0/1 mock booking foundation](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1), targeting `main` from `codex/saathi-phase01`. It is published for review, not merged/deployed. Inspect the PR's current-head checks; the implementation CI evidence below refers to the explicitly named tested source. The final local preview remains running on127.0.0.1:8781 with synthetic state.
+
 The coordinator session owns this additive implementation. The other four developer slots remain unassigned; old proposed lanes must be re-planned against the new PRD. Contributors still use separate branches/checkouts, confirmed scope and task-specific handoffs. This coordinator maintains root status.
 
 ## Implemented Phase0/1 foundation

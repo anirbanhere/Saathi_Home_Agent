@@ -2,6 +2,8 @@
 
 User-authorized27 October2026: adopt root PRD.md, execute Section14 kickoff. This supersedes the prior next-ticket selection and proposed team lanes for this scoped work; no other lane is assigned. Coordinator session owns additive `saathi/`, `saathi_web/`, `saathi_tests/`, configuration/migrations and the matching root documentation. Existing Home Agents source/deployment remains a compatibility baseline.
 
+Checkpoint28 October: the deterministic mock foundation is implemented/tested in [PR1](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1). See [the report](../docs/saathi-phase01-report.md) for executed evidence and blocked live-vendor/policy/real-speech acceptance. Do not repeat these increments or interpret mock scope as the full live MVP gate.
+
 ## Scope and assumptions
 
 - Product reference becomes Saathi; first locales en-IN/hi-IN/ta-IN. Malayalam is next-phase evaluation; Kannada remains a deferred earlier request, not silently claimed tested.
