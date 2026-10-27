@@ -1,5 +1,7 @@
 # Home Agents: Claude continuation
 
+Current replacement requirements are [PRD.md](PRD.md), Section14 Phase0/1. Read [the Saathi report](docs/saathi-phase01-report.md) before selecting work. The local `saathi/` FastAPI mock service and the still-deployed `home_agent/` Flask app are separate editions; the old next-ticket/sprint ordering is superseded where it conflicts. Phase2 is proposed, not automatically authorized.
+
 Read [AGENTS.md](AGENTS.md) for repository rules, then [HANDOFF.md](HANDOFF.md) for the latest checkpoint. This file is a small entry point, not a second set of conflicting rules.
 
 For four-developer parallel work, first use [DEVELOPMENT_START.md](DEVELOPMENT_START.md) and your confirmed [workboard assignment](docs/team-workboard.md). Contributors use separate branches/checkouts and ticket-specific handoffs; the coordinator owns root status and integration. Do not auto-select an already owned ticket.

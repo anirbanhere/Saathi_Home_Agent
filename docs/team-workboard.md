@@ -1,5 +1,7 @@
 # Four-developer coordination workboard
 
+**Current coordinator scope,28 October2026:** the human directly assigned Section14 Phase0/1 of the replacement root PRD.md to this coordinator session, on `codex/saathi-phase01`. Owned additive paths: `saathi/`, `saathi_web/`, `saathi_tests/`, config/migrations/requirements/CI and transition docs. [Implementation report](saathi-phase01-report.md). Other four developer slots remain unassigned; the proposed old lanes below must be re-planned against this PRD before coding. No parallel contributor was silently assigned or contacted.
+
 Created27 October2026. **Coordinator: project owner, unless the humans name a replacement. No developer/task reservation is active yet.** The rows below are a suggested initial split for four developer/Claude pairs. Replace slot labels with actual names and confirm scope before coding.
 
 Coordinator is the primary writer of this file and aggregate root context/status. Developers own their ticket-specific handoffs and feature branches. Each developer can review another lane, with the coordinator resolving cross-lane dependencies. This document is not a lock service or repository permission control.
@@ -32,7 +34,7 @@ Record a timestamp with timezone and PR/head commit at review. Reassignments req
 
 | Order | Ticket / PR / head commit | Prerequisite PRs/contracts | Test/runtime evidence | Review disposition | Merged commit / deployment |
 | --- | --- | --- | --- | --- | --- |
-| — | None queued by this document | — | — | — | — |
+| 1 | PRD Phase0/1 · [PR1](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1) | Replacement PRD Section14; standalone additive reference | Runtime `cf9bff1`:53 new +97 legacy checks, PostgreSQL/Redis and container smoke; see report/HANDOFF | Published for independent review; reviewer not assigned | Not merged or deployed |
 
 ## Coordination rhythm
 

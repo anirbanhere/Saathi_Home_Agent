@@ -1,5 +1,7 @@
 # Home Agents documentation
 
+**Current scope:** replacement [Saathi PRD](../PRD.md), [Phase0/1 implementation report/run commands](saathi-phase01-report.md), [reference architecture](architecture.md) and [ADR0004](decisions/0004-saathi-foundation-and-channel-gates.md). Prior backlog/sprints describe the older scope where they conflict; use the latest handoff. [Legacy architecture](legacy-home-agents-architecture.md) documents the still-deployed Flask/GCS app.
+
 Maintained baseline: 26 October 2026, Asia/Kolkata. This documentation pack prepares another engineer or Claude session to continue the existing repository. It does not certify unfinished product features as complete.
 
 ## Read in this order

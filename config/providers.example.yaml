@@ -1,0 +1,11 @@
+# Operator config, never accepted from a chat request. Phase1 is mock-only.
+models:
+  reasoning: {provider: mock, model: dental-planner-v1, timeout_seconds: 10, retries: 0}
+  conversation: {provider: mock, model: localized-reply-v1, timeout_seconds: 10, retries: 0}
+speech:
+  stt: {provider: mock, model: fixture-lookup-v1, timeout_seconds: 10, retries: 0}
+  tts: {provider: mock, model: synthetic-tone-v1, timeout_seconds: 10, retries: 0}
+policy:
+  approval_ttl_seconds: 300
+  max_steps: 8
+  max_tasks_per_user: 50

@@ -1,0 +1,42 @@
+services:
+  app:
+    profiles: [demo]
+    build:
+      context: .
+      dockerfile: Saathi.Dockerfile
+    environment:
+      SAATHI_DATABASE_URL: postgresql+psycopg://saathi:local-demo-only@postgres:5432/saathi
+      SAATHI_REDIS_URL: redis://redis:6379/0
+      WHATSAPP_PRODUCTION_ELIGIBLE: 'false'
+      SAATHI_LIVE_ACTIONS_ENABLED: 'false'
+      SAATHI_LIVE_SPEECH_ENABLED: 'false'
+    ports: ["127.0.0.1:8781:8781"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: saathi
+      POSTGRES_USER: saathi
+      POSTGRES_PASSWORD: local-demo-only
+    ports: ["127.0.0.1:54329:5432"]
+    volumes: ["saathi_pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saathi -d saathi"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports: ["127.0.0.1:63799:6379"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["saathi_redis:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  saathi_pg:
+  saathi_redis:

@@ -1,5 +1,7 @@
 # Home Agents: start development with any coding agent
 
+**Replacement PRD checkpoint,28 October2026:** [PRD.md](PRD.md) now governs the Saathi reference product. Read [the Phase0/1 report](docs/saathi-phase01-report.md) and HANDOFF.md first. Older work allocations/capability snapshots below describe the preserved Home Agents edition and must be reconfirmed before assignment. New service: `saathi/`, `saathi_web/`, `saathi_tests/`; install `requirements-saathi-dev.txt` and use its report's demo/tests. Do not replace the old public service, enable live vendors or start later PRD phases implicitly.
+
 Use this file to onboard four developers working with Claude or another coding agent in parallel. Give each developer their own checkout, one assigned task and the startup prompt below. Project owner acts as integration/release coordinator unless the humans name someone else.
 
 Repository: [anirbanhere/Saathi_Home_Agent](https://github.com/anirbanhere/Saathi_Home_Agent). Product: **Home Agents**. This is a development agreement, not permission to access accounts, send messages, provision resources or execute transactions.
@@ -149,7 +151,7 @@ Dependencies/accepted contract: <PR/commit/path, or none>.
 Publication permissions: <local commits only, or named branch/draft PR>.
 Cloud/live-provider permissions: <none unless specifically assigned>.
 
-Read DEVELOPMENT_START.md, AGENTS.md, CLAUDE.md, HANDOFF.md, MEMORY.md,
+Read PRD.md, DEVELOPMENT_START.md, AGENTS.md, CLAUDE.md, HANDOFF.md, MEMORY.md,
 SOUL.md and my confirmed row in docs/team-workboard.md. Then read my ticket,
 relevant source/tests and domain skills. Do not assume every proposal is built.
 First report actual repo/branch/base commit, assigned scope, dependencies,

@@ -1,10 +1,12 @@
 # Stable project memory
 
-Last updated: 27 October 2026, Asia/Kolkata.
+Last updated: 28 October 2026, Asia/Kolkata.
 
-- Product name: Home Agents. Saathi is a reference product brief, not an automatic rename.
-- Three domains: everyday tasks first, then cooking and inventory. Original languages: Tamil, Malayalam, Kannada, Hindi; English is also required.
-- Intended primary interface: WhatsApp voice. Immediate delivery priority: a public website with running Python and executable model-driven tools.
+- Replacement PRD adopted27 October2026: new reference product is Saathi, governed by root PRD.md. User explicitly requested Section14 Phase0/1 only: mock dental web/CLI vertical slice, provider-neutral roles and durable policy/task foundation. Legacy Home Agents public app remains separately deployed; it is not silently migrated or replaced.
+- New reference uses FastAPI/Pydantic2/SQLAlchemy/Alembic with PostgreSQL and Redis compose/CI. SQLite is local mock/test convenience. Phase1 models/STT/TTS are deterministic mocks; Sarvam/ElevenLabs have gated HTTP contract spikes, not live quality evidence. First locales are English/Hindi/Tamil; Malayalam is later, Kannada deferred from the earlier scope.
+- Hermes is optional. WhatsApp production eligibility defaults false pending current authoritative offering-specific review; live actions/speech remain disabled in Phase1. No Baileys production workaround, real calls, purchases, payments, IRCTC or actual clinic fulfillment follows from the PRD. Mock booking/delivery references are never real-world receipts.
+- Earlier Home Agents domains (everyday tasks, cooking, inventory) remain implemented legacy scope. The replacement PRD prioritizes the dental appointment vertical slice and staged action capabilities; do not apply the old delivery order to Phase0/1.
+- Intended primary interface: WhatsApp voice only where eligible. Current Phase0/1 delivery is local web/CLI with explicit mocks and disabled live channels; the existing public Python website remains available separately.
 - Models must be interchangeable. Initial preference is OpenRouter free inference, with a Meta adapter once access is ready. No automatic paid fallback.
 - Nous candidate models were catalogued but the human explicitly skipped credential setup/testing. Do not request that setup again or treat it as a required dependency unless reopened.
 - Keep the engineering documentation in this same source repository. Claude continuation starts with CLAUDE.md, HANDOFF.md and docs/README.md; current development tickets and proposed sprint scope live in docs/backlog.md and docs/sprint-plan.md.
@@ -12,7 +14,7 @@ Last updated: 27 October 2026, Asia/Kolkata.
 - Task execution uses a hybrid approach: reuse reliable APIs, inspect suitable public sites through an isolated browser, and hand off account/checkout steps. End users should not need their own developer API key for every task. Operator-managed providers remain useful when browser access is blocked or unreliable.
 - Public browser execution is a private Cloud Run service without household storage or model/railway secrets. It accepts structured read actions only, with fresh contexts and public-IP egress checks. Website research steps save source evidence and can resume; they do not yet run after the client closes.
 - Bills and food orders can have unverified handoff drafts; no real money or orders are executed. Strong identity, account sessions and a durable transaction store precede financial automation.
-- The user selected an owned, clearly labeled demo clinic calendar for a later appointment workflow. Do not claim an external clinic integration.
+- The user selected an owned demo clinic. Saathi Phase1 implements an explicit no-charge MOCK dental slot/booking store; no external clinic or genuine calendar provider is integrated.
 - GCP project: `sathi-home-agent`, number `59012364414`; selected region: `us-central1`. Billing is linked. The user reported INR 15,000 resources, but exact remaining credit/expiry/quotas have not been verified.
 - Website access: public link sharing is authorized. Browser workspaces remain separate until real household identity/sharing is implemented.
 - Current website placement: Cloud Run plus private Cloud Storage visitor snapshots. ADR-002 supersedes the VM recommendation for the immediate website; a continuous WhatsApp worker may need a different placement later.
