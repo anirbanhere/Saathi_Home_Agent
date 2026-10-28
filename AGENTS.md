@@ -1,5 +1,7 @@
 # Saathi and legacy Home Agents: instructions for coding agents
 
+Latest direction: the human requested an OpenDuet fork/customization. See HANDOFF.md first. The separate `https://github.com/anirbanhere/OpenDuet` checkout is currently at `artifacts/openduet/` and has its own AGENTS/CLAUDE/HANDOFF. Use an explicit working directory for it; do not commit the nested checkout, replace this repository or merge/deploy existing PRs implicitly. Rules below continue to govern this Python repository.
+
 ## Start with the smallest useful context
 
 Current product requirements are `PRD.md`, adopted from the human's replacement PRD. Section14 authorizes Phase0/1 only. Read `docs/saathi-phase01-report.md` and `tasks/saathi-phase01.md` for new-service scope; prior roadmap/ticket order is superseded where it conflicts. Preserve the still-deployed legacy website while the new local reference is reviewed.

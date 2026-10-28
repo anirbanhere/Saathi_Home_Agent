@@ -1,5 +1,7 @@
 # Saathi — reference service and legacy Home Agents demo
 
+**Latest development direction:** [Saathi on OpenDuet](https://github.com/anirbanhere/OpenDuet) is a separate customization fork. See [its initial PR](https://github.com/anirbanhere/OpenDuet/pull/1) and [current handoff](HANDOFF.md). The Python reference and public demo below remain separate and have not been replaced or migrated.
+
 **New plan:** [PRD.md](PRD.md) is the governing product brief. Section14 Phase0/1 now has an isolated local mock dental-booking implementation under `saathi/`. Start with the [implementation report and run commands](docs/saathi-phase01-report.md), [architecture](docs/architecture.md) and [current handoff](HANDOFF.md). No new public deployment, real speech recognition, WhatsApp launch or genuine appointment is claimed.
 
 **Continuation:** [local audio review](docs/saathi-local-media.md) adds private WAV upload, playback, expiry and deletion to the local UI. It does not transcribe recordings. Physical expiry cleanup is an explicit operator command, not a running scheduler.
