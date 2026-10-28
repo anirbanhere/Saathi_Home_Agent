@@ -2,6 +2,8 @@
 
 Last updated: 28 October 2026, Asia/Kolkata.
 
+- The human requested adopting an OpenDuet fork for customization: `https://github.com/anirbanhere/OpenDuet`, upstream `CopilotKit/OpenDuet` (MIT). Initial work uses its tenant extension, not a rewrite of platform internals. This Python repository and public deployment are preserved separately; no runtime/data migration is implied. The fork has its own context/PRs. CopilotKit Intelligence is a required upstream thread/memory dependency distinct from free model inference.
+
 - Saathi's local audio-review boundary accepts only permissioned PCM WAV for owned playback; it does not feed uploads into tasks/providers. Anonymous local ownership is not verified identity. Access expiry and physical erasure are separate: Delete or explicit cleanup removes files; no scheduler guarantee. Public media, real speech and account retention require a later design.
 
 - Replacement PRD adopted27 October2026: new reference product is Saathi, governed by root PRD.md. User explicitly requested Section14 Phase0/1 only: mock dental web/CLI vertical slice, provider-neutral roles and durable policy/task foundation. Legacy Home Agents public app remains separately deployed; it is not silently migrated or replaced.

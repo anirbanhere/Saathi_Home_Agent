@@ -1,5 +1,7 @@
 # Home Agents: Claude continuation
 
+Latest direction is a separate [OpenDuet customization fork](https://github.com/anirbanhere/OpenDuet), currently checked out at `artifacts/openduet/` with its own AGENTS/CLAUDE/HANDOFF. Read root HANDOFF.md for the transition, then use the fork's context when working there. This Python repository and its public deployment remain preserved.
+
 Current replacement requirements are [PRD.md](PRD.md), Section14 Phase0/1. Read [the Saathi report](docs/saathi-phase01-report.md) before selecting work. The local `saathi/` FastAPI mock service and the still-deployed `home_agent/` Flask app are separate editions; the old next-ticket/sprint ordering is superseded where it conflicts. Phase2 is proposed, not automatically authorized.
 
 Read [AGENTS.md](AGENTS.md) for repository rules, then [HANDOFF.md](HANDOFF.md) for the latest checkpoint. This file is a small entry point, not a second set of conflicting rules.
