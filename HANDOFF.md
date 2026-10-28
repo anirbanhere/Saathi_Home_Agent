@@ -1,5 +1,28 @@
 # Saathi development handoff
 
+## Latest continuation — private local audio review
+
+28 October2026, Asia/Kolkata. Active branch `codex/saathi-local-media`, based on Phase0/1 head `18502d2`. Storage source `c0b85ca`; local HTTP/UI/CI source `13dfcb6cc9c50b968cabdce2dee1fe077ae1e8ea`. Later documentation/build-context exclusions are separate commits. This continuation was scoped from the human's “continue” request; other developer slots remain unassigned.
+
+Review: [PR2 — local audio review](https://github.com/anirbanhere/Saathi_Home_Agent/pull/2), base `codex/saathi-phase01`. It is stacked on [PR1](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1). Merge order is PR1 then retarget/review PR2; neither was merged or deployed. Read [media report/setup/API/recovery limits](docs/saathi-local-media.md) and [execution contract](tasks/saathi-local-media.md) before changing this slice. Prior Phase0/1 checkpoint below remains historical evidence.
+
+Implemented: raw PCM WAV upload with explicit permission/CSRF/same-origin session; owner-scoped list/metadata/content/delete; additive migration0002; random private filenames, bounded size/duration/quota; integrity checks; server-enforced access expiry; repeat-safe deletion and explicit `python -m saathi.cli media-cleanup` batches. Local UI supports file selection, native playback, reload and deletion; focus is restored after deleting a card. No uploaded bytes enter the task/model/speech path.
+
+Verification:
+
+- Local74 new tests passed, one real PostgreSQL integration skipped (local Linux Docker daemon unavailable);97 legacy tests passed. New/legacy JS syntax checks and Python compile pass; no dependencies added.
+- [Implementation CI40638228924](https://github.com/anirbanhere/Saathi_Home_Agent/actions/runs/40638228924), source `13dfcb6`:75 Saathi tests passed, including real PostgreSQL16/Redis7 media metadata/read/delete plus prior concurrency/restart tests;97 legacy tests passed; container build and loopback health smoke passed. Current PR-head checks may include later documentation-only commits; inspect those before merging.
+- Actual isolated Chromium selected a generated0.25s tone through native file input, confirmed permission, uploaded201, played to completion (`readyState=4`, ended=true, no media error), restored saved audio after reload, deleted bytes/control and restored focus to Refresh audio. Mobile390px viewport client/scroll375/375; desktop1440px1425/1425; separate mobile emulation390/390. Console showed only existing favicon404s. DevTools file-path access failed, so the full upload flow used an isolated Playwright CLI browser. Review screenshots/state stay ignored; no real recording used.
+- Ownership/unknown404s, expiry410, consent/CSRF/origin/type, chunked byte limits, exact60s bound, corrupt/truncated/unsupported WAV, quota contention, restart, failed-write cleanup, missing files and migration preservation have regression coverage. Configured-secret exact-content scan of staged implementation found zero matches.
+
+Local preview:127.0.0.1:8781, Uvicorn process6992, ignored database `artifacts/saathi-media-review.sqlite3`, root `artifacts/saathi-media-review`; synthetic uploaded files were deleted through the UI. It remains a local reference, not a remotely accessible demo. Existing public GCP revision/build listed below are unchanged.
+
+Limits: anonymous local identity is not verified account ownership. Access expiry does not erase bytes; Delete or explicit operator cleanup is required, with no background scheduler. Filesystem+SQL are not atomic across crashes; orphan discovery/backup erasure are unimplemented. Local filesystem permissions are not production encryption/Windows ACL proof. Already buffered copies cannot be revoked. Public media, real ASR/TTS, WhatsApp, genuine appointments and real-world execution remain disabled/unimplemented for Saathi.
+
+Next actionable work: independent review of PR1/PR2 and a narrow permissioned speech-evaluation assignment (exact provider/model/license/hardware, allowed sample corpus, en/hi/ta critical-field accuracy and latency/cost). Do not feed uploaded clips to providers until data-use consent and durable execution/retention contracts are agreed. No provider key, new third-party message, payment or public deployment is pending as part of this finished slice. Nous remains skipped.
+
+## Prior Phase0/1 checkpoint
+
 Updated:28 October2026, Asia/Kolkata. Branch: `codex/saathi-phase01`. Runtime source: `cf9bff1` (concurrent HTTP fix); CI/container source included. Later context/report and test-format changes do not change application behavior.
 
 ## Human objective and current scope

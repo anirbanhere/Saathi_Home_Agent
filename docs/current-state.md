@@ -2,6 +2,8 @@
 
 ## New reference checkpoint —28 October2026
 
+Continuation adds owner-scoped local WAV upload/playback/delete and a bounded explicit expiry-cleanup CLI, on top of the Phase0/1 branch. [Media report](saathi-local-media.md) documents limits, verification and SQL/filesystem recovery gaps. Recordings are not transcribed or sent to providers; identity is still the anonymous local principal. Access expiry alone does not erase files; no background cleanup or public upload endpoint is claimed. Current PR/CI evidence is in root HANDOFF.md.
+
 The user replaced the PRD and authorized Section14 Phase0/1. New `saathi/` FastAPI/Pydantic/PostgreSQL-targeted service provides a local, deterministic mock dental workflow with independent model/speech roles, durable approvals/operations/outbox and web/CLI. See [implementation evidence](saathi-phase01-report.md). It has not replaced the public website. Live speech/model/provider acceptance and WhatsApp eligibility remain gated; synthetic audio tones are not an ASR benchmark. The older capability matrix below describes the preserved Home Agents deployment.
 
 Baseline inspected: source commit `08d0bbe`, 27 October 2026; earlier release evidence is preserved below. This is a code/documentation audit of the existing release, not a fresh availability guarantee. Consult HANDOFF.md for later changes.

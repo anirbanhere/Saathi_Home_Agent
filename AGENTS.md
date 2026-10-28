@@ -4,6 +4,8 @@
 
 Current product requirements are `PRD.md`, adopted from the human's replacement PRD. Section14 authorizes Phase0/1 only. Read `docs/saathi-phase01-report.md` and `tasks/saathi-phase01.md` for new-service scope; prior roadmap/ticket order is superseded where it conflicts. Preserve the still-deployed legacy website while the new local reference is reviewed.
 
+Later continuation adds the bounded local audio-review slice on `codex/saathi-local-media`, stacked on the Phase0/1 branch. Read `docs/saathi-local-media.md` and `tasks/saathi-local-media.md`; this does not authorize public uploads, verified identity or live speech/actions. Expiry denies new playback requests; physical deletion requires Delete or explicit `python -m saathi.cli media-cleanup` against the same database/media root. No background cleanup guarantee.
+
 1. Read `HANDOFF.md` for current status, active work, evidence, and outstanding blockers.
 2. Read `MEMORY.md` for stable product decisions and `SOUL.md` for intended assistant behavior.
    Claude sessions can start at `CLAUDE.md`; `docs/README.md` indexes the engineering pack, and `docs/current-state.md` distinguishes shipped facts from proposals. Select current work from `docs/backlog.md` and `docs/sprint-plan.md`; older `tasks/*` plans are historical where superseded.

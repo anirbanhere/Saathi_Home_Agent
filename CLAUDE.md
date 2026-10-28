@@ -4,6 +4,8 @@ Current replacement requirements are [PRD.md](PRD.md), Section14 Phase0/1. Read 
 
 Read [AGENTS.md](AGENTS.md) for repository rules, then [HANDOFF.md](HANDOFF.md) for the latest checkpoint. This file is a small entry point, not a second set of conflicting rules.
 
+The later bounded continuation adds [private local audio review](docs/saathi-local-media.md), stacked on Phase0/1. It provides storage/playback/delete, with explicit cleanup; it is not STT, verified identity or public media hosting. Preserve the PR dependency order in HANDOFF.md.
+
 For four-developer parallel work, first use [DEVELOPMENT_START.md](DEVELOPMENT_START.md) and your confirmed [workboard assignment](docs/team-workboard.md). Contributors use separate branches/checkouts and ticket-specific handoffs; the coordinator owns root status and integration. Do not auto-select an already owned ticket.
 
 ## Start a session

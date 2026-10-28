@@ -2,6 +2,8 @@
 
 Last updated: 28 October 2026, Asia/Kolkata.
 
+- Saathi's local audio-review boundary accepts only permissioned PCM WAV for owned playback; it does not feed uploads into tasks/providers. Anonymous local ownership is not verified identity. Access expiry and physical erasure are separate: Delete or explicit cleanup removes files; no scheduler guarantee. Public media, real speech and account retention require a later design.
+
 - Replacement PRD adopted27 October2026: new reference product is Saathi, governed by root PRD.md. User explicitly requested Section14 Phase0/1 only: mock dental web/CLI vertical slice, provider-neutral roles and durable policy/task foundation. Legacy Home Agents public app remains separately deployed; it is not silently migrated or replaced.
 - New reference uses FastAPI/Pydantic2/SQLAlchemy/Alembic with PostgreSQL and Redis compose/CI. SQLite is local mock/test convenience. Phase1 models/STT/TTS are deterministic mocks; Sarvam/ElevenLabs have gated HTTP contract spikes, not live quality evidence. First locales are English/Hindi/Tamil; Malayalam is later, Kannada deferred from the earlier scope.
 - Hermes is optional. WhatsApp production eligibility defaults false pending current authoritative offering-specific review; live actions/speech remain disabled in Phase1. No Baileys production workaround, real calls, purchases, payments, IRCTC or actual clinic fulfillment follows from the PRD. Mock booking/delivery references are never real-world receipts.

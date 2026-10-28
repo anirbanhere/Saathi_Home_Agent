@@ -2,6 +2,8 @@
 
 **New plan:** [PRD.md](PRD.md) is the governing product brief. Section14 Phase0/1 now has an isolated local mock dental-booking implementation under `saathi/`. Start with the [implementation report and run commands](docs/saathi-phase01-report.md), [architecture](docs/architecture.md) and [current handoff](HANDOFF.md). No new public deployment, real speech recognition, WhatsApp launch or genuine appointment is claimed.
 
+**Continuation:** [local audio review](docs/saathi-local-media.md) adds private WAV upload, playback, expiry and deletion to the local UI. It does not transcribe recordings. Physical expiry cleanup is an explicit operator command, not a running scheduler.
+
 ```text
 python -m pip install -r requirements-saathi-dev.txt
 python -m uvicorn saathi.main:create_app --factory --host 127.0.0.1 --port 8781
