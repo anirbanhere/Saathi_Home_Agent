@@ -26,6 +26,9 @@ class Settings(Contract):
     approval_ttl_seconds: int = Field(default=300, ge=1, le=900)
     max_steps: int = Field(default=8, ge=4, le=8)
     max_tasks_per_user: int = Field(default=50, ge=1, le=100)
+    media_root: str = "data/saathi-media"
+    media_ttl_seconds: int = Field(default=900, ge=60, le=3600)
+    media_max_objects_per_user: int = Field(default=5, ge=1, le=10)
 
     @model_validator(mode="after")
     def phase_one_gates(self):
@@ -62,6 +65,8 @@ class Settings(Contract):
                 "SAATHI_DATABASE_URL", "sqlite:///data/saathi-demo.sqlite3"
             ),
             redis_url=os.environ.get("SAATHI_REDIS_URL", ""),
+            media_root=os.environ.get("SAATHI_MEDIA_ROOT", "data/saathi-media"),
+            media_ttl_seconds=os.environ.get("SAATHI_MEDIA_TTL_SECONDS", "900"),
         )
         for field, env in [
             ("whatsapp_production_eligible", "WHATSAPP_PRODUCTION_ELIGIBLE"),

@@ -16,7 +16,7 @@ from saathi.runtime import Runtime
 from test_runtime import approve
 
 
-def test_real_postgres_migration_concurrency_restart_and_redis_readiness():
+def test_real_postgres_migration_concurrency_restart_and_redis_readiness(tmp_path):
     url = os.environ.get("SAATHI_TEST_POSTGRES_URL")
     if not url:
         pytest.skip(
@@ -42,6 +42,15 @@ def test_real_postgres_migration_concurrency_restart_and_redis_readiness():
             clock=lambda: datetime(2026, 10, 27, 5, tzinfo=timezone.utc),
         )
         users = [runtime.create_user("en-IN") for _ in range(2)]
+        from saathi.media import MediaStore
+        from saathi.speech import fixture_audio
+
+        local_media = MediaStore(store, Settings(media_root=str(tmp_path / "pg-media")))
+        audio = local_media.upload(
+            users[0], fixture_audio("en-IN"), "audio/wav", consent=True
+        )
+        assert local_media.content(users[0], audio["id"]) == fixture_audio("en-IN")
+        assert local_media.delete(users[0], audio["id"])["state"] == "deleted"
         previews = []
         for user in users:
             task = asyncio.run(
