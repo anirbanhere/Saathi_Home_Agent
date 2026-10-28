@@ -22,6 +22,8 @@ from .speech import fixture_audio
 from .registry import ToolRegistry, MockAppointmentTool
 from .http_limits import BodyLimit
 from .observability import configure_logging
+from .media import MediaStore, MAX_BYTES
+from .media_routes import register_media_routes
 from pydantic import Field
 import base64
 
@@ -61,7 +63,10 @@ def create_app(settings=None, store=None):
     runtime = Runtime(store, settings)
     app = FastAPI(title="Saathi — local mock reference", docs_url=None, redoc_url=None)
     app.state.runtime = runtime
-    app.add_middleware(BodyLimit)
+    media = MediaStore(store, settings)
+    app.state.media = media
+    app.add_middleware(BodyLimit, limits_by_path={"/api/media": MAX_BYTES})
+    register_media_routes(app, media)
     registry = ToolRegistry()
     registry.register(MockAppointmentTool(runtime))
     events = deque()
@@ -78,19 +83,25 @@ def create_app(settings=None, store=None):
         # This initial identity/media boundary is deliberately limited to loopback.
         if request.url.hostname not in {"127.0.0.1", "localhost", "::1"}:
             return error("Phase1 web service is loopback-only.", "LOCAL_ONLY", 403)
+        uploading_audio = request.method == "POST" and request.url.path == "/api/media"
+        maximum = MAX_BYTES if uploading_audio else 60000
         if (
             request.headers.get("content-length", "0").isdigit()
-            and int(request.headers.get("content-length", "0")) > 60000
+            and int(request.headers.get("content-length", "0")) > maximum
         ):
-            return error("Request exceeds60KB.", "PAYLOAD_LIMIT", 413)
+            return error(
+                "Request exceeds the allowed byte limit.", "PAYLOAD_LIMIT", 413
+            )
         if request.method in {"POST", "DELETE", "PATCH", "PUT"}:
             origin = f"{request.url.scheme}://{request.url.netloc}"
-            if (
-                request.headers.get("origin") != origin
-                or request.headers.get("content-type", "").split(";")[0]
-                != "application/json"
-            ):
-                return error("Use same-origin JSON requests.", "ORIGIN_DENIED", 403)
+            if request.headers.get("origin") != origin or request.headers.get(
+                "content-type", ""
+            ).split(";")[0] != ("audio/wav" if uploading_audio else "application/json"):
+                return error(
+                    "Use a same-origin request with the expected content type.",
+                    "ORIGIN_DENIED",
+                    403,
+                )
             now = datetime.now(timezone.utc).timestamp()
             while events and events[0] < now - 60:
                 events.popleft()
@@ -140,7 +151,7 @@ def create_app(settings=None, store=None):
     async def http_error(request, exc):
         return error(
             (
-                "Request exceeds60KB."
+                "Request exceeds the allowed byte limit."
                 if exc.status_code == 413
                 else "Unsupported request or route."
             ),
@@ -352,7 +363,7 @@ def create_app(settings=None, store=None):
         return FileResponse(WEB / "index.html")
 
     @app.get("/assets/{name}")
-    def asset(name: Literal["app.js", "style.css"]):
+    def asset(name: Literal["app.js", "style.css", "media.js"]):
         return FileResponse(WEB / name)
 
     return app
