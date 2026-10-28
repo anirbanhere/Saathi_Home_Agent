@@ -4,5 +4,6 @@
 .venv
 data
 artifacts
+.playwright-cli
 sites
 **/__pycache__

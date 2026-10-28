@@ -1,5 +1,7 @@
 # Sprint plan
 
+Latest checkpoint,28 October2026: [local audio-review continuation](saathi-local-media.md) is implemented for review, stacked on Phase0/1. This completes only storage/playback/delete, not the full identity/media or live speech sprint. Current evidence and merge order are in HANDOFF.md; other developer slots remain unassigned.
+
 **Superseded ordering:** the user adopted the replacement Saathi PRD and requested its Section14 Phase0/1. Use [the implementation report](saathi-phase01-report.md) and latest HANDOFF.md for current work. This older calendar/ticket selection is historical wherever it conflicts; Phase2 work needs an explicit scoped assignment.
 
 Status: proposed schedule, not a commitment or completed checklist. Baseline: 26 October 2026. Capacity assumption: one engineer, roughly 4–6 focused engineering hours/day plus AI assistance; outside account/language review is not guaranteed. Re-estimate after the first completed tickets. Use acceptance evidence, not elapsed time, to mark work done.

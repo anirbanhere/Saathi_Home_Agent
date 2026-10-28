@@ -1,5 +1,7 @@
 # Four-developer coordination workboard
 
+**Continuation scope,28 October2026:** coordinator owns the bounded local audio-review contract in [tasks/saathi-local-media.md](../tasks/saathi-local-media.md), on `codex/saathi-local-media` based on Phase0/1 head `18502d2`. Owned paths: additive media/schema/tests, narrow local HTTP/config/CLI/UI, CI and coordinator docs. No verified identity/live speech/public deployment scope; other four slots remain unassigned. [Media report](saathi-local-media.md).
+
 **Current coordinator scope,28 October2026:** the human directly assigned Section14 Phase0/1 of the replacement root PRD.md to this coordinator session, on `codex/saathi-phase01`. Owned additive paths: `saathi/`, `saathi_web/`, `saathi_tests/`, config/migrations/requirements/CI and transition docs. [Implementation report](saathi-phase01-report.md). Other four developer slots remain unassigned; the proposed old lanes below must be re-planned against this PRD before coding. No parallel contributor was silently assigned or contacted.
 
 Created27 October2026. **Coordinator: project owner, unless the humans name a replacement. No developer/task reservation is active yet.** The rows below are a suggested initial split for four developer/Claude pairs. Replace slot labels with actual names and confirm scope before coding.
@@ -35,6 +37,7 @@ Record a timestamp with timezone and PR/head commit at review. Reassignments req
 | Order | Ticket / PR / head commit | Prerequisite PRs/contracts | Test/runtime evidence | Review disposition | Merged commit / deployment |
 | --- | --- | --- | --- | --- | --- |
 | 1 | PRD Phase0/1 · [PR1](https://github.com/anirbanhere/Saathi_Home_Agent/pull/1) | Replacement PRD Section14; standalone additive reference | Runtime `cf9bff1`:53 new +97 legacy checks, PostgreSQL/Redis and container smoke; see report/HANDOFF | Published for independent review; reviewer not assigned | Not merged or deployed |
+| 2 | Local media review · [PR2](https://github.com/anirbanhere/Saathi_Home_Agent/pull/2), runtime `13dfcb6` | PR1 first; PR2 base is `codex/saathi-phase01` | CI40638228924:75 Saathi +97 legacy tests, PostgreSQL/Redis, container health; actual browser upload/play/reload/delete | Published for independent review; reviewer not assigned | Not merged or deployed |
 
 ## Coordination rhythm
 

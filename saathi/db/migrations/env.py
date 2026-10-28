@@ -1,7 +1,7 @@
 import os
 from alembic import context
 from sqlalchemy import create_engine
-from saathi.db.schema_v1 import metadata
+from saathi.db.schema_v2 import metadata
 
 config = context.config
 connection = config.attributes.get("connection")

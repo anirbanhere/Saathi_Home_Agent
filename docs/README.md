@@ -4,6 +4,8 @@
 
 Maintained baseline: 26 October 2026, Asia/Kolkata. This documentation pack prepares another engineer or Claude session to continue the existing repository. It does not certify unfinished product features as complete.
 
+Latest additive slice,28 October2026: [private local audio review](saathi-local-media.md), [execution contract](../tasks/saathi-local-media.md). See the current handoff for the stacked PR and verification; Phase2 identity/speech/public rollout remain separate work.
+
 ## Read in this order
 
 | Need | Document |

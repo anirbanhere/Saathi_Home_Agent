@@ -18,8 +18,22 @@
     </form>
     <p id="status" role="status" aria-live="polite" aria-atomic="true"></p>
     <section id="result" class="panel" tabindex="-1" aria-label="Current mock task" hidden></section>
+    <section class="panel" aria-labelledby="audio-title">
+      <h2 id="audio-title">Review an audio file locally</h2>
+      <p class="hint">This stores audio for playback only. It is not transcribed or sent to an AI provider. Use a synthetic or permissioned clip. Access expires at the time shown; Delete removes the stored audio now. Background deletion is not running.</p>
+      <form id="audio-form">
+        <label for="review-audio">PCM WAV · mono16kHz,16-bit · up to60 seconds /2MB</label>
+        <input id="review-audio" type="file" accept=".wav,audio/wav" required>
+        <label class="consent"><input id="audio-consent" type="checkbox" required> I have permission to use this clip for local review.</label>
+        <button type="submit">Upload for local review</button>
+      </form>
+      <div class="section-head"><h3>Stored audio</h3><button id="refresh-audio" type="button" class="secondary">Refresh audio</button></div>
+      <p id="audio-status" role="status" aria-live="polite"></p>
+      <div id="audio-list"></div>
+    </section>
     <section class="panel"><div class="section-head"><h2>Saved tasks</h2><button id="refresh" type="button" class="secondary">Refresh history</button></div><div id="history"></div></section>
     <details class="panel"><summary>Configured provider roles · all mocked</summary><pre id="profiles"></pre></details>
   </section>
 </main><footer>Saathi reference implementation · explicit mocks, reviewable actions.</footer>
+<script src="/assets/media.js" defer></script>
 </body></html>

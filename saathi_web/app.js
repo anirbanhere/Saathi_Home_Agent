@@ -2,23 +2,23 @@
 const $ = s => document.querySelector(s);
 let csrf = "", current = null, busy = false;
 const node = (tag, value) => { const n = document.createElement(tag); if (value !== undefined) n.textContent = value; return n; };
-async function api(path, body) {
-  const response = await fetch(path, body === undefined ? {} : {method:"POST", headers:{"Content-Type":"application/json", "X-Saathi-CSRF":csrf}, body:JSON.stringify(body)});
+async function api(path, body, method="POST") {
+  const response = await fetch(path, body === undefined ? {} : {method, headers:{"Content-Type":"application/json", "X-Saathi-CSRF":csrf}, body:JSON.stringify(body)});
   const result = await response.json();
   if (!response.ok) throw new Error(result.error?.message || "Request failed. Refresh saved state before retrying.");
   return result;
 }
-async function run(action) {
+async function run(action, focusAfter=null) {
   if (busy) return;
   const focused = document.activeElement;
   busy = true;
   document.querySelectorAll("button").forEach(b => {b.disabled = true;});
-  $("#status").textContent = "Working with mock data…";
-  try { await action(); $("#status").textContent = "Saved locally. All results are explicitly mocked."; }
+  $("#status").textContent = "Working locally…";
+  try { await action(); $("#status").textContent = "Saved locally. Appointment actions remain mock-only."; }
   catch (e) { $("#status").textContent = e.message; }
-  finally { busy = false; document.querySelectorAll("button").forEach(b => {b.disabled = false;}); if(document.activeElement===document.body && focused?.isConnected) focused.focus(); }
+  finally { busy = false; document.querySelectorAll("button").forEach(b => {b.disabled = false;}); if(document.activeElement===document.body) (focused?.isConnected ? focused : focusAfter)?.focus(); }
 }
-function button(label, action, style="secondary") { const b=node("button",label);b.type="button";b.className=style;b.addEventListener("click",()=>run(action));return b; }
+function button(label, action, style="secondary", focusAfter=null) { const b=node("button",label);b.type="button";b.className=style;b.addEventListener("click",()=>run(action,focusAfter));return b; }
 async function history() {
   const tasks=await api("/api/tasks"), list=$("#history"); list.replaceChildren();
   if(!tasks.length) list.append(node("p","Your first mock task will appear here."));
@@ -46,7 +46,7 @@ async function show(task) {
   const details=node("details"), summary=node("summary","Task plan and pinned provider roles");details.append(summary,node("pre",JSON.stringify({plan:task.payload.plan,profiles:task.profiles},null,2)));area.append(details);
   await history();area.focus();
 }
-async function enter(session) {csrf=session.csrf;$("#session-panel").hidden=true;$("#workspace").hidden=false;await history();$("#profiles").textContent=JSON.stringify((await api("/api/provider-connections")).profiles,null,2);}
+async function enter(session) {csrf=session.csrf;$("#session-panel").hidden=true;$("#workspace").hidden=false;await history();document.dispatchEvent(new Event("saathi-session-ready"));$("#profiles").textContent=JSON.stringify((await api("/api/provider-connections")).profiles,null,2);}
 $("#start").addEventListener("click",()=>run(async()=>enter(await api("/api/session",{consent_mock_data:true,locale:$("#locale").value}))));
 $("#message-form").addEventListener("submit",e=>{e.preventDefault();run(async()=>show(await api("/api/chat/messages",{external_id:crypto.randomUUID(),text:$("#message").value,locale:$("#locale").value,...(current?.status==="CLARIFICATION_REQUIRED"?{conversation_id:current.conversation_id}:{})})));});
 $("#voice").addEventListener("click",()=>run(async()=>{const locale=$("#locale").value,fixture=await api(`/api/fixtures/${locale}`);await show(await api("/api/chat/messages",{external_id:crypto.randomUUID(),audio_base64:fixture.audio_base64,mime:fixture.mime,locale}));}));

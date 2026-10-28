@@ -1,5 +1,7 @@
 # Implementable development backlog
 
+**Latest continuation,28 October2026:** the local media-review portion is implemented for review; see [media report](saathi-local-media.md) and HANDOFF.md. Do not rebuild it or treat the historical “ready work” order below as the current assignment. Next proposed slice is a permissioned speech evaluation with explicit provider/sample/accuracy acceptance; verified identity and public retention remain open.
+
 **Supersession note,28 October2026:** root PRD.md is the new product brief. Its Section14 Phase0/1 execution and proposed Phase2 PRs are tracked in [the implementation report](saathi-phase01-report.md), [current plan](../tasks/saathi-phase01.md) and HANDOFF.md. Tickets below retain historical/future context; do not use their old priority/dependency order to override the replacement PRD.
 
 Baseline: 26 October 2026. All tickets are proposed/unstarted unless explicitly marked otherwise. Existing shipped work is in [current state](current-state.md), not re-listed as unfinished. The documentation pack is `DOC-01`; its verification is recorded in HANDOFF.md.

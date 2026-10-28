@@ -11,6 +11,7 @@ from .db import Store
 from .runtime import Runtime
 from .speech import fixture_audio
 from .outbox import drain_mock
+from .media import MediaStore
 
 
 async def demo(runtime, locale, voice=False, ambiguous=False):
@@ -60,7 +61,9 @@ def main():
     parser = argparse.ArgumentParser(
         description="Saathi Phase1 local mock demo; no live actions"
     )
-    parser.add_argument("command", choices=["demo", "fixtures", "providers", "migrate"])
+    parser.add_argument(
+        "command", choices=["demo", "fixtures", "providers", "migrate", "media-cleanup"]
+    )
     parser.add_argument(
         "--locale", choices=["en-IN", "hi-IN", "ta-IN"], default="en-IN"
     )
@@ -93,7 +96,18 @@ def main():
         return
     store = Store(settings.database_url)
     try:
-        if args.command == "migrate":
+        if args.command == "media-cleanup":
+            print(
+                json.dumps(
+                    {
+                        "expired_files_removed": MediaStore(
+                            store, settings
+                        ).purge_expired(),
+                        "batch_limit": 50,
+                    }
+                )
+            )
+        elif args.command == "migrate":
             print(
                 "Saathi mock schema migrated; existing Home Agents data is untouched."
             )
